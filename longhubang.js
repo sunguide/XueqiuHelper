@@ -37,8 +37,8 @@ let urls = {
 
 let loginPass = {
     remember_me: true,
-    username: "18521527528",
-    password: "woshini8",
+    username: "xxx",
+    password: "xx",
     captcha: ""
 };
 
