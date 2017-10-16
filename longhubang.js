@@ -69,8 +69,8 @@ let lhb = {
                 '-1346.88' ],
             [ '国泰君安证券股份有限公司顺德东乐路证券营业部', '0.00', '1346.55', '-1346.55' ] ] }
 
-getLHB();
-// geneImage(lhb,function () {});
+// getLHB();
+geneImage(lhb,function () {});
 // post();
 
 // getLogin(function (cookie) {
@@ -249,11 +249,12 @@ function geneImage(lhb,callback) {
         .drawText(30, 150, "成交额：" + all_amount + "    合计买入：" + lhb.buy_amount + "万元    合计卖出：" +lhb.sell_amount + "万元    净额：" + (parseFloat(lhb.buy_amount) - parseFloat(lhb.sell_amount)).toFixed(2) + "万元")
         .fill("#f5f8fa")
         .drawRectangle(25,170,970,220)
-        .fill("#2f2f2f")
+        .fill("red")
         .drawText(35, 200, "买入金额最大的前5名营业部")
         .drawText(600, 200, "买入额/万")
         .drawText(700, 200, "卖出额/万")
-        .drawText(800, 200, "净额/万");
+        .drawText(800, 200, "净额/万")
+        .fill("red");
 
         if(lhb.buy_details){
             let y = 250;
@@ -278,7 +279,8 @@ function geneImage(lhb,callback) {
             .drawText(35, 500, "卖出金额最大的前5名营业部")
             .drawText(600, 500, "买入额/万")
             .drawText(700, 500, "卖出额/万")
-            .drawText(800, 500, "净额/万");
+            .drawText(800, 500, "净额/万")
+            .fill("green");
         if(lhb.sell_details){
             let y = 550;
             lhb.sell_details.forEach(function(item,i){
