@@ -37,7 +37,7 @@ let urls = {
 
 let loginPass = {
     remember_me: true,
-    username: "18521527527",
+    username: "18521527528",
     password: "woshini8",
     captcha: ""
 };
@@ -69,8 +69,8 @@ let lhb = {
                 '-1346.88' ],
             [ '国泰君安证券股份有限公司顺德东乐路证券营业部', '0.00', '1346.55', '-1346.55' ] ] }
 
-// getLHB();
-geneImage(lhb,function () {});
+getLHB();
+// geneImage(lhb,function () {});
 // post();
 
 // getLogin(function (cookie) {
@@ -165,7 +165,6 @@ function getLHB() {
                     sell_details:sell_details
                 };
                 console.log(lhb);
-                return;
                 sleepTime += 121000;
                 setTimeout(function () {
                     geneImage(lhb,function (lhb_data) {
@@ -241,8 +240,8 @@ function geneImage(lhb,callback) {
     }
     // img.save('lhb.jpg');
     let gm = require("gm");
-    let img = gm(1000, 900, "#e4f2ff")
-        .font('./data/font/msjk.ttf')      //引入预先下载的黑体字库
+    let img = gm(900, 1000, "#e4f2ff")
+        .font('./data/font/msyh.ttf')      //引入预先下载的黑体字库
         .fontSize(28)
         .drawText(30, 50, lhb.title)
         .fontSize(16)
@@ -277,9 +276,9 @@ function geneImage(lhb,callback) {
             .drawRectangle(25,470,870,520)
             .fill("#2f2f2f")
             .drawText(35, 500, "卖出金额最大的前5名营业部")
-            .drawText(700, 500, "买入额/万")
-            .drawText(800, 500, "卖出额/万")
-            .drawText(900, 500, "净额/万");
+            .drawText(600, 500, "买入额/万")
+            .drawText(700, 500, "卖出额/万")
+            .drawText(800, 500, "净额/万");
         if(lhb.sell_details){
             let y = 550;
             lhb.sell_details.forEach(function(item,i){
@@ -302,16 +301,24 @@ function geneImage(lhb,callback) {
         img.drawText(630,850, "『龙虎榜助手』");
         img.fill("#2f2f2f");
         img.drawText(740,850, "倾情提供");
-        img.drawText(700,880, "https://xueqiu.com/longhubang");
+        img.drawText(600,880, "https://xueqiu.com/longhubang");
         let filepath = config.images_path + lhb.stock_code + "_" + moment(lhb.date).format("YYYYMMDD") + ".jpg";
         img.write(filepath,function (err) {
             if(err){
                 console.log(err);
             }else{
-                lhb.img_path = filepath;
-                callback(lhb);
+                gm("./data/images/top.jpg")
+                    .append(filepath)
+                    .write(filepath,function (err) {
+                        if(err){
+                            console.log(err);
+                        }else{
+                            lhb.img_path = filepath;
+                            callback(lhb);
+                        }
+                    });
             }
-        })
+        });
 
 }
 
