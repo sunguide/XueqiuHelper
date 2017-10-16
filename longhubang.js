@@ -21,7 +21,7 @@ const moment = require("moment");
 const fs = require("fs");
 const coroutine = require("coroutine");
 
-require("superagent-charset")(request)
+require("superagent-charset")(request);
 
 let cookie;
 let config = {
@@ -37,12 +37,18 @@ let urls = {
 
 let loginPass = {
     remember_me: true,
-    username: "xxx",
-    password: "xx",
+    username: "18521527527",
+    password: "woshini8",
     captcha: ""
 };
 
-let lhb = { stock_code: '603963',
+let hasPosted = [];
+let sleepTime = 0;
+let currentDate = moment().format("YYYY-MM-DD");
+
+let lhb = {
+    stock_code: '603963',
+    stock_name: '大理药业',
     title: '大理药业(603963)：2017年10月12日龙虎榜',
     reason: "日换手率达20%的证券",
     buy_amount: '6661.61',
@@ -63,14 +69,15 @@ let lhb = { stock_code: '603963',
                 '-1346.88' ],
             [ '国泰君安证券股份有限公司顺德东乐路证券营业部', '0.00', '1346.55', '-1346.55' ] ] }
 
-getLHB();
-// geneImage(lhb);
+// getLHB();
+geneImage(lhb,function () {});
 // post();
 
 // getLogin(function (cookie) {
 //     cookie = cookie;
 //     uploadImg("./images/000560_20171013.jpg");
 // });
+// getTodayStockInfo('000970',function () {});
 
 function getFullStockCode(stock_code){
     if(stock_code < "600000"){
@@ -81,14 +88,16 @@ function getFullStockCode(stock_code){
 }
 
 
-let hasPosted = ['300562','000301','603963','002846','300076','300262','600007','002856','600499','603963','002900'];
-let sleepTime = 0;
 function getLHB() {
     request.get("http://data.10jqka.com.cn/market/longhu/")
         .charset("GBK")
         .end((err,res) => {
             let $ = cheerio.load(res.text,{decodeEntities: false});
             let today = $(".m_text_date.startday").val();
+            if(today != currentDate){
+                console.log("未获得最新的龙虎榜");
+                return;
+            }
             $('.stockcont').each(function (i,item) {
                 item = $(item);
                 let stock_code = item.attr('stockcode');
@@ -99,8 +108,15 @@ function getLHB() {
                 let lhb_reason = lhb_title.split("明细：")[1];
                 let stock_name = lhb_title.split("(")[0];
                 lhb_title = stock_name + "(" + stock_code + ")：" + today + " 龙虎榜数据";
+                let unitNames = item.find('.cell-cont p').first().text().split("元");
                 let buy_amount = item.find('.cell-cont p .c-rise').first().text();
+                if(unitNames[1][unitNames[1].length - 1] === "亿"){
+                    buy_amount = buy_amount * 10000;
+                }
                 let sell_amount = item.find('.cell-cont p .c-fall').first().text();
+                if(unitNames[2][unitNames[2].length - 1] === "亿"){
+                    sell_amount = sell_amount * 10000;
+                }
                 let buy_details = [];
                 let sell_details = [];
                 item.find(".m-table").first().find("tr").each(function (i,item1) {
@@ -149,6 +165,7 @@ function getLHB() {
                     sell_details:sell_details
                 };
                 console.log(lhb);
+                return;
                 sleepTime += 121000;
                 setTimeout(function () {
                     geneImage(lhb,function (lhb_data) {
@@ -213,7 +230,7 @@ function getLHB() {
 
 
 function geneImage(lhb,callback) {
-    let images = require("images");
+    // let images = require("images");
 
     // let img = images(400, 1000)
     //     .fill(0xff, 0x00, 0x00, 0.5);
@@ -221,13 +238,12 @@ function geneImage(lhb,callback) {
     if(all_amount > 10000){
         all_amount = (all_amount/10000).toFixed(2) + "亿元";
     }else{
-        all_amount += "万元";
+        all_amount = all_amount.toFixed(2) + "万元";
     }
     // img.save('lhb.jpg');
     let gm = require("gm");
-
-    let img = gm(1000, 1000, "#e4f2ff")
-        .font('msyh.ttf')      //引入预先下载的黑体字库
+    let img = gm(1000, 900, "#e4f2ff")
+        .font('./data/font/msjk.ttf')      //引入预先下载的黑体字库
         .fontSize(28)
         .drawText(30, 50, lhb.title)
         .fontSize(16)
@@ -237,9 +253,9 @@ function geneImage(lhb,callback) {
         .drawRectangle(25,170,970,220)
         .fill("#2f2f2f")
         .drawText(35, 200, "买入金额最大的前5名营业部")
-        .drawText(700, 200, "买入额/万")
-        .drawText(800, 200, "卖出额/万")
-        .drawText(900, 200, "净额/万");
+        .drawText(600, 200, "买入额/万")
+        .drawText(700, 200, "卖出额/万")
+        .drawText(800, 200, "净额/万");
 
         if(lhb.buy_details){
             let y = 250;
@@ -248,18 +264,18 @@ function geneImage(lhb,callback) {
                     if(k === 0){
                         img.drawText(35,y,kitem);
                     }else if(k === 1){
-                        img.drawText(700,y,kitem);
+                        img.drawText(600,y,kitem);
                     }else if(k === 2){
-                        img.drawText(800,y,kitem);
+                        img.drawText(700,y,kitem);
                     }else{
-                        img.drawText(900,y,kitem);
+                        img.drawText(800,y,kitem);
                     }
                 });
                 y +=50;
             });
         }
         img.fill("#f5f8fa")
-            .drawRectangle(25,470,970,520)
+            .drawRectangle(25,470,870,520)
             .fill("#2f2f2f")
             .drawText(35, 500, "卖出金额最大的前5名营业部")
             .drawText(700, 500, "买入额/万")
@@ -272,21 +288,21 @@ function geneImage(lhb,callback) {
                     if(k === 0){
                         img.drawText(35,y,kitem);
                     }else if(k === 1){
-                        img.drawText(700,y,kitem);
+                        img.drawText(600,y,kitem);
                     }else if(k === 2){
-                        img.drawText(800,y,kitem);
+                        img.drawText(700,y,kitem);
                     }else{
-                        img.drawText(900,y,kitem);
+                        img.drawText(800,y,kitem);
                     }
                 });
                 y +=50;
             });
         }
-        img.drawText(700,850, "雪球");
+        img.drawText(600,850, "雪球");
         img.fill("red")
-        img.drawText(730,850, "『龙虎榜助手』");
+        img.drawText(630,850, "『龙虎榜助手』");
         img.fill("#2f2f2f");
-        img.drawText(840,850, "倾情提供");
+        img.drawText(740,850, "倾情提供");
         img.drawText(700,880, "https://xueqiu.com/longhubang");
         let filepath = config.images_path + lhb.stock_code + "_" + moment(lhb.date).format("YYYYMMDD") + ".jpg";
         img.write(filepath,function (err) {
@@ -312,7 +328,6 @@ function post() {
             // cookie.push(res.headers["set-cookie"].join(",").match(/(xq_r_token.sig=.+?);/)[0]);
             // cookie.push(res.headers["set-cookie"].join(",").match(/(xq_is_login=.+?);/)[0]);
             // cookie.push(res.headers["set-cookie"].join(",").match(/(xq_is_login.sig=.+?);/)[0]);
-
             request.post(urls.login)
                 .set(base_headers)
                 .set("Cookie", cookie)
@@ -369,6 +384,7 @@ function getLogin(callback) {
             cookie = res.headers["set-cookie"].join(",").match(/(xq_a_token=.+?);/)[1];
             let is_login = res.headers["set-cookie"].join(",").match(/(xq_is_login=.*?);/)[1];
             if(is_login !== "xq_is_login="){
+                console.log('has logined');
                 callback(cookie);
             }else{
                 request.post(urls.login)
@@ -396,6 +412,8 @@ function getLogin(callback) {
                             console.log('cookie:');
                             console.log(cookie);
                             callback(cookie);
+                        }else{
+                            console.log(res.text);
                         }
                     });
             }
@@ -415,4 +433,85 @@ function uploadImg(filePath,callback){
                 callback(resData.url + '/' + resData.filename);
             }
         })
+}
+
+let departments  = [
+    {"招商证券深圳蛇口工业七路证券营业部": "知名游资『乔帮主』"},
+    {"中信证券溧阳路证券营业部":"知名游资席位"},
+    {"中信证券上海古北路证券营业部":"知名游资席位"},
+    {"中信证券上海瑞金南路证券营业部":"知名游资席位"},
+    {"中信证券上海淮海中路证券营业部":"知名游资席位"},
+    {"浙商证券绍兴解放北路证券营业部":"宁波敢死队『赵老哥』"},
+    {"中国银河证券绍兴证券营业部":"知名游资『赵老哥』"},
+    {"中国银河证券北京阜成路证券营业部":"知名游资『赵老哥』"},
+    {"华泰证券浙江分公司":"知名游资『赵老哥』"},
+    {"湘财证券上海陆家嘴证券营业部":"知名游资『赵老哥』"},
+    {"华泰证券永嘉阳光大道证券营业部":"知名游资『赵老哥』"},
+    {"光大证券佛山绿景路证券营业部":"知名游资『佛山无影脚』"},
+    {"光大证券佛山季华六路":"知名游资『佛山无影脚』"},
+    {"长江证券佛山普澜二路":"知名游资『佛山无影脚』"},
+    {"湘财证券佛山祖庙路":"知名游资『佛山无影脚』"},
+    {"华泰证券成都南一环路证券营业部":"知名游资『职业炒手』"},
+    {"国泰君安证券成都北一环路证券营业部":"知名游资『职业炒手』"},
+    {"国信证券成都二环路证券营业部":"知名游资『职业炒手』"},
+    {"华鑫证券上海宛平南路证券营业部":"知名游资『炒股养家』"},
+    {"华鑫证券宁波沧海路证券营业部":"知名游资『炒股养家』"},
+    {"华鑫证券上海淞滨路证券营业部":"知名游资『炒股养家』"},
+    {"华鑫证券上海松江证券营业部":"知名游资『炒股养家』"},
+    {"华鑫证券上海茅台路证券营业部":"知名游资『炒股养家』"},
+    {"光大证券宁波解放南路证券营业部":"宁波敢死队"},
+    {"华泰证券厦门厦禾路证券营业部":"著名实力游资"},
+    {"中信建投证券宜昌解放路证券营业部":"知名游资『瑞鹤仙』"},
+    {"中国银河证券宜昌新世纪证券营业部":"知名游资『瑞鹤仙』"},
+    {"新时代证券宜昌东山大道证券营业部":"知名游资『瑞鹤仙』"},
+    {"中信证券杭州延安路证券营业部":"著名牛散章建平席位"},
+    {"财通证券有限责任公司绍兴人民中路证券营业部":"浙江帮绍兴知名游资"},
+    {"华泰证券南京六合彤华街证券营业部":"知名游资『桃仙大神龙飞虎』"},
+    {"光大证券股份有限公司杭州庆春路证券营业部":"知名游资"},
+    {"华泰证券股份有限公司上海武定路证券营业部":"新生代游资"},
+    {"华泰证券股份有限公司北京雍和宫证券营业部龙虎榜数据":"牛散唐汉若"}
+];
+
+function getTodayStockInfo(stock_code,callback) {
+    getLogin(function (cookie) {
+        request.get("https://xueqiu.com/v4/stock/quote.json?code=" + getFullStockCode(stock_code) + "&_=" + new Date().getTime())
+            .set("Cookie", cookie)
+            .end((err, res) => {
+            console.log(res.text);
+            callback(info);
+        });
+    });
+
+}
+function analyze(lhb) {
+    //分析买入榜
+    //模型一，买一主买封涨停
+    //模型二，卖一砸盘封跌停
+    let buyers = [];
+    let comments = [];
+    if(lhb.buy_details){
+        lhb.buy_details.forEach(function (item,i){
+            let departmentName = item[0].split('[')[0];
+            let departmentAliasName = departmentName;
+            if(departments[departmentName]){
+                departmentAliasName = buyers[i] = departments[departmentName];
+            }
+            if(i == 0){
+                comments.push(departmentAliasName + "主买封涨停");
+            }
+        });
+    }
+
+    if(lhb.sell_details){
+        lhb.sell_details.forEach(function (item,i){
+            let departmentName = item[0].split('[')[0];
+            let departmentAliasName = departmentName;
+            if(departments[departmentName]){
+                departmentAliasName = buyers[i] = departments[departmentName];
+            }
+            if(i == 0){
+                comments.push(departmentAliasName + "主卖封涨停");
+            }
+        });
+    }
 }
