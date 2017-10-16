@@ -228,7 +228,6 @@ function getLHB() {
         });
 }
 
-
 function geneImage(lhb,callback) {
     // let images = require("images");
 
