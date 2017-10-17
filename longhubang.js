@@ -281,7 +281,7 @@ function geneImage(lhb,callback) {
     }
     img.drawText(220, 70, stock_quote.percentage + "%");
     img.fill("#2f2f2f");
-    img.drawText(300, 70, "换手率：" + lhb.closing_quote[getFullStockCode(lhb.stock_code)].turnover_rate + "  总市值：" + (stock_quote.marketCapital/100000000).toFixed(2) + "亿元    市盈率：" + parseFloat(stock_quote.pe_ttm).toFixed(2));
+    img.drawText(300, 70, "换手率：" + stock_quote.turnover_rate + "  总市值：" + (stock_quote.marketCapital/100000000).toFixed(2) + "亿元    市盈率：" + parseFloat(stock_quote.pe_ttm).toFixed(2));
 
     //龙虎榜
     img.drawText(30, 105, "上榜理由："+lhb.reason)
