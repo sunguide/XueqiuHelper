@@ -20,13 +20,20 @@ const iconv = require("iconv-lite");
 const moment = require("moment");
 const fs = require("fs");
 const coroutine = require("coroutine");
+const nedb = require('nedb');
 
 require("superagent-charset")(request);
 
+// 实例化连接对象（不带参数默认为内存数据库）
+const db = new nedb({
+    filename: '/data/save.db',
+    autoload: true
+});
 let cookie;
 let config = {
     "images_path": "./images/"
 };
+
 let urls = {
     home: "https://xueqiu.com",
     login: "https://xueqiu.com/snowman/login",
@@ -69,15 +76,18 @@ let lhb = {
                 '-1346.88' ],
             [ '国泰君安证券股份有限公司顺德东乐路证券营业部', '0.00', '1346.55', '-1346.55' ] ] }
 
-// getLHB();
-geneImage(lhb,function () {});
+getLHB();
+// geneImage(lhb,function () {});
 // post();
 
 // getLogin(function (cookie) {
 //     cookie = cookie;
 //     uploadImg("./images/000560_20171013.jpg");
 // });
-// getTodayStockInfo('000970',function () {});
+// getTodayStockInfo('603963',function (quote) {
+//     lhb.closing_quote = quote;
+//     geneImage(lhb);
+// });
 
 function getFullStockCode(stock_code){
     if(stock_code < "600000"){
@@ -117,6 +127,8 @@ function getLHB() {
                 if(unitNames[2][unitNames[2].length - 1] === "亿"){
                     sell_amount = sell_amount * 10000;
                 }
+                buy_amount = parseFloat(buy_amount).toFixed(2);
+                sell_amount = parseFloat(sell_amount).toFixed(2);
                 let buy_details = [];
                 let sell_details = [];
                 item.find(".m-table").first().find("tr").each(function (i,item1) {
@@ -167,59 +179,63 @@ function getLHB() {
                 console.log(lhb);
                 sleepTime += 121000;
                 setTimeout(function () {
-                    geneImage(lhb,function (lhb_data) {
-                        getLogin(function (cookie) {
-                            uploadImg(lhb_data.img_path,function (img_url) {
-                                request.get(urls.token)
-                                    .set(base_headers)
-                                    .set("Cookie", cookie)
-                                    .end((err, res) => {
+                    getTodayStockInfo(lhb.stock_code,function (quote) {
+                        lhb.closing_quote = quote;
+                        geneImage(lhb,function (lhb_data) {
+                            getLogin(function (cookie) {
+                                uploadImg(lhb_data.img_path,function (img_url) {
+                                    request.get(urls.token)
+                                        .set(base_headers)
+                                        .set("Cookie", cookie)
+                                        .end((err, res) => {
                                         let data = JSON.parse(res.text);
-                                        if(data.token){
-                                            let stock_anchor = lhb_data.stock_name + "(" + getFullStockCode(lhb_data.stock_code) + ")";
-                                            let form = {
-                                                "status": '<p> $' + stock_anchor + '$  ' +lhb.date + '龙虎榜' + '</p><p>上榜理由：'+ lhb.reason + '</p><div class="img-single-upload"><img src="' + img_url + '" class="ke_img"></div>',
-                                                "session_token": data.token
-                                            };
-                                            request.post(urls.post)
-                                                .set(base_headers)
-                                                .set("Cookie", cookie)
-                                                .type("form")
-                                                .send(form)
-                                                .end((err,res) => {
-                                                    let resData = JSON.parse(res.text);
-                                                    if(resData.error_code == "20204"){
-                                                        // setTimeout(function () {
-                                                        //     request.post(urls.post)
-                                                        //         .set(base_headers)
-                                                        //         .set("Cookie", cookie)
-                                                        //         .type("form")
-                                                        //         .send(form)
-                                                        //         .end((err,res) => {
-                                                        //             let resData = JSON.parse(res.text);
-                                                        //
-                                                        //             if(resData.error_code){
-                                                        //                 console.log(resData);
-                                                        //             }
-                                                        //         });
-                                                        // },i * 100000);
-                                                        console.log(res.text);
-                                                    }else if(resData.error_code){
-                                                        console.log(resData);
-                                                    }else{
-                                                        hasPosted.push(lhb_data.stock_code);
-                                                        fs.writeFileSync('./hasPosted.txt',hasPosted.toString());
-                                                    }
-                                                })
+                                    if(data.token){
+                                        let stock_anchor = lhb_data.stock_name + "(" + getFullStockCode(lhb_data.stock_code) + ")";
+                                        let form = {
+                                            "status": '<p> $' + stock_anchor + '$  ' +lhb.date + '龙虎榜' + '</p><p>上榜理由：'+ lhb.reason + '</p><div class="img-single-upload"><img src="' + img_url + '" class="ke_img"></div>',
+                                            "session_token": data.token
+                                        };
+                                        request.post(urls.post)
+                                            .set(base_headers)
+                                            .set("Cookie", cookie)
+                                            .type("form")
+                                            .send(form)
+                                            .end((err,res) => {
+                                            let resData = JSON.parse(res.text);
+                                        if(resData.error_code == "20204"){
+                                            // setTimeout(function () {
+                                            //     request.post(urls.post)
+                                            //         .set(base_headers)
+                                            //         .set("Cookie", cookie)
+                                            //         .type("form")
+                                            //         .send(form)
+                                            //         .end((err,res) => {
+                                            //             let resData = JSON.parse(res.text);
+                                            //
+                                            //             if(resData.error_code){
+                                            //                 console.log(resData);
+                                            //             }
+                                            //         });
+                                            // },i * 100000);
+                                            console.log(res.text);
+                                        }else if(resData.error_code){
+                                            console.log(resData);
                                         }else{
-                                            console.log('get post token fail');
+                                            hasPosted.push(lhb_data.stock_code);
+                                            fs.writeFileSync('./hasPosted.txt',hasPosted.toString());
                                         }
-                                    });
+                                    })
+                                    }else{
+                                        console.log('get post token fail');
+                                    }
+                                });
+                                });
+
                             });
 
-                        });
+                        })
+                    });
 
-                    })
                 },sleepTime)
 
             });
@@ -238,14 +254,37 @@ function geneImage(lhb,callback) {
     }else{
         all_amount = all_amount.toFixed(2) + "万元";
     }
+
     // img.save('lhb.jpg');
     let gm = require("gm");
     let img = gm(900, 1000, "#e4f2ff")
         .font('./data/font/msyh.ttf')      //引入预先下载的黑体字库
-        .fontSize(28)
-        .drawText(30, 50, lhb.title)
-        .fontSize(16)
-        .drawText(30, 100, "上榜理由："+lhb.reason)
+        .fontSize(26)
+        .drawText(30, 40, lhb.title)
+        .fontSize(16);
+    //股票收盘
+    let stock_quote = lhb.closing_quote[getFullStockCode(lhb.stock_code).toUpperCase()];
+    img.drawText(32, 70, "收盘价：");
+    if(stock_quote && stock_quote.percentage > 0){
+        img.fill("red")
+    }else if(stock_quote && stock_quote.percentage < 0){
+        img.fill("green");
+    }
+    img.drawText(100, 70, stock_quote.close);
+    img.fill("#2f2f2f")
+        .drawText(160, 70,"涨跌幅：");
+
+    if(stock_quote && stock_quote.percentage> 0){
+        img.fill("red");
+    }else if(stock_quote && stock_quote.percentage < 0){
+        img.fill("green");
+    }
+    img.drawText(220, 70, stock_quote.percentage + "%");
+    img.fill("#2f2f2f");
+    img.drawText(300, 70, "换手率：" + lhb.closing_quote[getFullStockCode(lhb.stock_code)].turnover_rate + "  总市值：" + (stock_quote.marketCapital/100000000).toFixed(2) + "亿元    市盈率：" + parseFloat(stock_quote.pe_ttm).toFixed(2));
+
+    //龙虎榜
+    img.drawText(30, 105, "上榜理由："+lhb.reason)
         .drawText(30, 150, "成交额：" + all_amount + "    合计买入：" + lhb.buy_amount + "万元    合计卖出：" +lhb.sell_amount + "万元    净额：" + (parseFloat(lhb.buy_amount) - parseFloat(lhb.sell_amount)).toFixed(2) + "万元")
         .fill("#f5f8fa")
         .drawRectangle(25,170,970,220)
@@ -298,9 +337,10 @@ function geneImage(lhb,callback) {
                 y +=50;
             });
         }
-        img.drawText(600,850, "雪球");
+        img.fill("#2f2f2f")
+            .drawText(600,850, "雪球");
         img.fill("red")
-        img.drawText(630,850, "『龙虎榜助手』");
+            .drawText(630,850, "『龙虎榜助手』");
         img.fill("#2f2f2f");
         img.drawText(740,850, "倾情提供");
         img.drawText(600,880, "https://xueqiu.com/longhubang");
@@ -309,6 +349,7 @@ function geneImage(lhb,callback) {
             if(err){
                 console.log(err);
             }else{
+                console.log('gene image');
                 gm("./data/images/top.jpg")
                     .append(filepath)
                     .write(filepath,function (err) {
@@ -343,17 +384,7 @@ function post() {
                 .send(loginPass)
                 .redirects(0)
                 .end((err, res) => {
-                    // console.log(res);
-                    // request.post(urls.post)
-                    //     .set(base_headers)
-                    //     .set("Cookie", cookie)
-                    //     .type("form")
-                    //     .send({status:"<p>士大夫似懂非懂是f</p>",session_token: "GAOQvCDru0U8epFCXkc2vc"})
-                    //     .redirects(0)
-                    //     .end((err, res) => {
-                    //         console.log(res);
-                    //     });
-                    console.log(cookie);
+
                     console.log(res.text);
                     let loginData = JSON.parse(res.text);
                     if(loginData.access_token){
@@ -428,6 +459,7 @@ function getLogin(callback) {
         });
 
 }
+//上传图片到雪球
 function uploadImg(filePath,callback){
     request.post(urls.upload)
         .set(base_headers)
@@ -485,7 +517,8 @@ function getTodayStockInfo(stock_code,callback) {
         request.get("https://xueqiu.com/v4/stock/quote.json?code=" + getFullStockCode(stock_code) + "&_=" + new Date().getTime())
             .set("Cookie", cookie)
             .end((err, res) => {
-            console.log(res.text);
+            let info = JSON.parse(res.text);
+            console.log(info);
             callback(info);
         });
     });

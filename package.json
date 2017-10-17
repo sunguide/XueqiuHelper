@@ -5,6 +5,7 @@
     "gm": "^1.23.0",
     "iconv-lite": "^0.4.19",
     "moment": "^2.19.1",
+    "nedb": "^1.8.0",
     "superagent": "^3.6.3",
     "superagent-charset": "^1.2.0"
   }
