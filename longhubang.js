@@ -288,7 +288,6 @@ function geneImage(lhb,callback) {
         .drawText(30, 150, "成交额：" + all_amount + "    合计买入：" + lhb.buy_amount + "万元    合计卖出：" +lhb.sell_amount + "万元    净额：" + (parseFloat(lhb.buy_amount) - parseFloat(lhb.sell_amount)).toFixed(2) + "万元")
         .fill("#f5f8fa")
         .drawRectangle(25,170,970,220)
-        .fill("red")
         .drawText(35, 200, "买入金额最大的前5名营业部")
         .drawText(600, 200, "买入额/万")
         .drawText(700, 200, "卖出额/万")
