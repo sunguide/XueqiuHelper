@@ -104,7 +104,7 @@ async function getLHB() {
             let today = $(".m_text_date.startday").val();
             if(today != currentDate){
                 console.log("未获得最新的龙虎榜");
-                return;
+                // return;
             }
             $('.stockcont').each(function (i,item) {
                 item = $(item);
@@ -175,13 +175,14 @@ async function getLHB() {
                     sell_details:sell_details
                 };
                 // console.log(lhb);
-                sleepTime += 0;
+                if(stock_code < 600000){
+                    return;
+                }
                 setTimeout(function () {
                     getTodayStockInfo(lhb.stock_code,function (quote) {
                         lhb.closing_quote = quote;
                         lhb.comments = analyze(lhb);
                         console.log(lhb.comments);
-                        return;
                         geneImage(lhb,function (lhb_data) {
                             getLogin(function (cookie) {
                                 uploadImg(lhb_data.img_path,function (img_url) {
@@ -224,7 +225,8 @@ async function getLHB() {
                         })
                     });
 
-                },sleepTime)
+                },sleepTime);
+                sleepTime += 121000;
 
             });
 
@@ -547,7 +549,7 @@ function _getTodayStockInfo(stock_code) {
     let stock_quote;
         stock_quote = lhb.closing_quote;
     //amplitude振幅
-    if(parseFloat(stock_quote.amplitude) > 12){
+    if(parseFloat(stock_quote.amplitude) > 12 && parseFloat(stock_quote.amplitude) < 40){
         comments.push("主力推动股价巨幅波动走过山车")
     }
     console.log(stock_quote);
@@ -583,5 +585,5 @@ function _getTodayStockInfo(stock_code) {
     }
 
     console.log(comments);
-    return comments.join(",");
+    return comments.join(", ");
 }
