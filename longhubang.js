@@ -73,6 +73,8 @@ let lhb = {
             [ '国泰君安证券股份有限公司顺德东乐路证券营业部', '0.00', '1346.55', '-1346.55' ] ] }
 
 getLHB();
+
+// getMiwen(500);
 // geneImage(lhb,function () {});
 // post();
 
@@ -287,6 +289,7 @@ function geneImage(lhb,callback) {
         .drawText(30, 150, "成交额：" + all_amount + "    合计买入：" + lhb.buy_amount + "万元    合计卖出：" +lhb.sell_amount + "万元    净额：" + (parseFloat(lhb.buy_amount) - parseFloat(lhb.sell_amount)).toFixed(2) + "万元")
         .fill("#f5f8fa")
         .drawRectangle(25,170,970,220)
+        .fill("#2f2f2f")
         .drawText(35, 200, "买入金额最大的前5名营业部")
         .drawText(600, 200, "买入额/万")
         .drawText(700, 200, "卖出额/万")
@@ -586,4 +589,17 @@ function _getTodayStockInfo(stock_code) {
 
     console.log(comments);
     return comments.join(", ");
+}
+
+function getMiwen(len) {
+    len = len || 32;
+    var $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var maxPos = $chars.length;
+    var pwd = '';
+    for (var i = 0; i < len; i++) {
+        //0~32的整数
+        pwd += $chars.charAt(Math.floor(Math.random() * (maxPos+1)));
+    }
+    console.log(pwd);
+    return pwd;
 }
