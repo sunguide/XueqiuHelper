@@ -27,7 +27,7 @@ module.exports = app => {
                 login: "https://xueqiu.com/snowman/login",
                 token: "https://xueqiu.com/service/csrf?api=%2Fstatuses%2Fupdate.json&_=1507965835009",
                 post: "https://xueqiu.com/statuses/update.json",
-                upload: "https://xueqiu.com/photo/upload.json"
+                upload: "https://xueqiu.com/photo/upload.json",
             };
         }
 
@@ -43,14 +43,37 @@ module.exports = app => {
                 timeout: ['30s', '30s'],
             }, opts);
 
-            const result = yield this.ctx.curl(`${this.serverUrl}/${api}`, options);
-            return result.data;
+            const result = yield this.ctx.curl(`https://xueqiu.com/S/${api}`, options);
+            return result.data.toString();
         }
 
+        * getRecentPoster(stock_code){
+            const _ = require('lodash');
+
+            let now = Date.now();
+            let options = {
+              headers: {Cookie:yield this.getLoginCookie()},
+              dataType: 'json'
+            };
+            stock_code = xueqiu.getFullStockCode(stock_code);
+            const res = yield this.ctx.curl(`https://xueqiu.com/statuses/search.json?count=10&comment=0&symbol=${stock_code}&hl=0&source=user&sort=time&page=1&_=${now}`,options);
+            let data = res.data;
+            let posters = [];
+            if(data.list){
+               for(let i = 0; i < data.list.length; i++){
+                  if(data.list[i].user_id > 0){
+                     posters.push(data.list[i].user.screen_name);
+                  }
+               }
+            }
+            return posters;_.uniq(posters);
+        }
 
         * post(message) {
             let urls = this.urls;
             let token = yield this.getToken();
+            let base_headers = this.base_headers;
+            let cookie = yield this.getLoginCookie();
             let form = {
                 "status": message,
                 "session_token": token
@@ -66,12 +89,12 @@ module.exports = app => {
                         if(err){
                             reject(err);
                         }
+                        console.log(res.text);
                         if (resData.error_code == "20204") {
                             //重发
                             console.log("请重发");
                             resolve(false)
                         } else if (resData.error_code) {
-                            console.log(resData);
                             resolve(false)
                         } else {
                             resolve(true)
@@ -84,7 +107,7 @@ module.exports = app => {
             let cookie = yield this.getLoginCookie();
             let urls = this.urls;
             let base_headers = this.base_headers;
-            return new Promise((resolve, reject => {
+            return new Promise((resolve, reject) => {
                 request.post(urls.upload)
                     .set(base_headers)
                     .set("Cookie", cookie)
@@ -98,8 +121,8 @@ module.exports = app => {
                         }else{
                             resolve(false);
                         }
-                    })
-            }));
+                    });
+            });
         }
 
         * getToken() {
@@ -124,19 +147,22 @@ module.exports = app => {
         * getTodayStockInfo(stock_code) {
             console.log('start');
             let cookie = yield this.getLoginCookie();
-            return new Promise(function (resolve, reject) {
-                request.get("https://xueqiu.com/v4/stock/quote.json?code=" + xueqiu.getFullStockCode(stock_code) + "&_=" + new Date().getTime())
-                    .set("Cookie", cookie)
-                    .end((err, res) => {
-                        let info = JSON.parse(res.text);
-                        info = info[xueqiu.getFullStockCode(stock_code)];
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve(info);
-                        }
-                    });
-            });
+            let quote = yield function () {
+                return new Promise(function (resolve, reject) {
+                    request.get("https://xueqiu.com/v4/stock/quote.json?code=" + xueqiu.getFullStockCode(stock_code) + "&_=" + new Date().getTime())
+                        .set("Cookie", cookie)
+                        .end((err, res) => {
+                            let info = JSON.parse(res.text);
+                            info = info[xueqiu.getFullStockCode(stock_code)];
+                            if (err) {
+                                reject(err);
+                            } else {
+                                resolve(info);
+                            }
+                        });
+                });
+            }();
+            return quote;
         }
 
         * getLoginCookie() {
@@ -186,7 +212,6 @@ module.exports = app => {
                 });
             }();
         }
-
         static getFullStockCode(stock_code) {
             if (stock_code < "600000") {
                 return "SZ" + stock_code;

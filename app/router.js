@@ -2,6 +2,8 @@
 
 module.exports = app => {
   app.get('/', 'home.index');
+  app.get('/test', 'home.test');
+
   // app.get('/api', 'api.index');
   // app.get('/api/idCard', 'api.idCard');
   // app.get('/api/ip', 'api.ip');
