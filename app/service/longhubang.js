@@ -142,6 +142,7 @@ module.exports = app => {
               .drawText(30, 150, "成交额：" + all_amount + "    合计买入：" + lhb.buy_amount + "万元    合计卖出：" +lhb.sell_amount + "万元    净额：" + (parseFloat(lhb.buy_amount) - parseFloat(lhb.sell_amount)).toFixed(2) + "万元")
               .fill("#f5f8fa")
               .drawRectangle(25,170,970,220)
+              .fill("#2f2f2f")
               .drawText(35, 200, "买入金额最大的前5名营业部")
               .drawText(600, 200, "买入额/万")
               .drawText(700, 200, "卖出额/万")
@@ -197,7 +198,7 @@ module.exports = app => {
               img.fill("#2f2f2f");
               img.drawText(740,850, "倾情提供");
               img.drawText(600,880, "https://xueqiu.com/longhubang");
-              let filepath = './images/' + lhb.stock_code + "_" + moment(lhb.date).format("YYYYMMDD") + ".jpg";
+              let filepath = './images/' + lhb.identify + ".jpg";
               return new Promise((resolve, reject) => {
                 img.write(filepath,function (err) {
                     if(err){
@@ -271,6 +272,47 @@ module.exports = app => {
 
             console.log(comments);
             return comments.join(",");
+        }
+        //是否发布到雪球
+        * isPostedXueqiu(identify){
+            const Datastore = require('nedb');
+            const db = new Datastore({ filename: './data/database/post_record.db', autoload: true });
+            return new Promise((resolve, reject) => {
+               db.find({identify:identify},function (err,docs) {
+                   if(err){
+                       reject(err);
+                   }else{
+                       if(docs.length > 0 && docs[0].success){
+                           resolve(true);
+                       }else{
+                           resolve(false);
+                       }
+                   }
+               })
+            });
+        }
+        //是否发布到雪球
+        * setPostedXueqiu(identify, success){
+            const Datastore = require('nedb');
+            const db = new Datastore({ filename: './data/database/post_record.db', autoload: true });
+            return new Promise((resolve, reject) => {
+                let data = {identify:identify,success:success};
+                db.find({identify:identify}, function (err, docs) {
+                    if(err){
+                        reject(err);
+                    }else{
+                        if(docs.length > 0){
+                            db.update({_id:docs[0]._id},{ $set: data },function (err) {
+                                resolve(true);
+                            });
+                        }else{
+                            db.insert(data,function (err) {
+                                resolve(true);
+                            });
+                        }
+                    }
+                });
+            });
         }
         getDepartments(){
             return  [
