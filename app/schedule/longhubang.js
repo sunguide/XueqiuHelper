@@ -2,7 +2,7 @@
 module.exports =  {
   // 通过 schedule 属性来设置定时任务的执行间隔等配置
   schedule: {
-    interval: '1m', // 1 分钟间隔
+    interval: '1d', // 1 分钟间隔
     type: 'worker', // 指定所有的 worker 都需要执行
   },
   // task 是真正定时任务执行时被运行的函数，第一个参数是一个匿名的 Context 实例
@@ -30,7 +30,6 @@ module.exports =  {
        logger.info("龙虎榜脚本 已经正在运行，当前work将退出");
        return;
     }
-    yield app.cache.set("longhubang_run",1);
     let lhbs = yield this.service.longhubang.getLhbs(this.ctx.helper.datetime("YYYY-MM-DD"));
     let identify;
     let result;
@@ -65,6 +64,8 @@ module.exports =  {
             }else{
                multi.sh = 1;
             }
+            yield this.ctx.helper.sleep(120000);
+
         }
         if((multi.sz + multi.sh) == 2){
             yield app.cache.set(runKey,2);

@@ -90,11 +90,11 @@ module.exports = app => {
                             reject(err);
                         }
                         console.log(res.text);
-                        if (resData.error_code == "20204") {
+                        if (resData && resData.error_code == "20204") {
                             //重发
                             console.log("请重发");
                             resolve(-1)
-                        } else if (resData.error_code) {
+                        } else if (resData && resData.error_code) {
                             resolve(false)
                         } else {
                             console.log("发布失败");

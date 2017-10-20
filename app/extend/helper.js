@@ -19,5 +19,12 @@ module.exports = helper = {
   datetime(format){
       const moment = require("moment");
       return moment().format(format);
+  },
+  * sleep(timeout){
+      return new Promise((resolve, reject) => {
+        setTimeout(function(){
+            resolve(true);
+        },timeout);
+      });
   }
 };

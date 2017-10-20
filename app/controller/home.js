@@ -5,10 +5,10 @@ module.exports = app => {
         * index() {
             // this.ctx.body = "fuck ";
 
-          
+            yield this.ctx.helper.sleep(10000);
             // console.log(lhbs);
 
-            this.ctx.body = lhbs;
+            this.ctx.body = "hddd";
         }
         * test(){
 
