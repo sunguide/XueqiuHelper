@@ -15,5 +15,9 @@ module.exports = helper = {
       md5.update(str);
       str = md5.digest('hex');
       return str.toUpperCase();
+  },
+  datetime(format){
+      const moment = require("moment");
+      return moment().format(format);
   }
 };
