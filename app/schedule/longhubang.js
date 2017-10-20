@@ -47,8 +47,8 @@ module.exports =  {
             if(posters){
                 posters = "<p>[鼓鼓掌][鼓鼓掌][鼓鼓掌]有请股友@" + _.chunk(posters,5)[0].join(", @") + " 来点评一下今日的龙虎榜单[献花花][献花花][献花花]</p>";
             }
-//
-            let imagePath = yield this.service.longhubang.geneImage(lhbs[i]);continue;
+
+            let imagePath = yield this.service.longhubang.geneImage(lhbs[i]);
             let uploadImageURL = yield this.service.xueqiu.uploadImage(imagePath);
             let stock_anchor = this.ctx.helper.getStockAnchor(lhbs[i].stock_code, lhbs[i].stock_name);
             let comments = lhbs[i].comments ? (`<p>榜单分析：${lhbs[i].comments}</p>`) : "";
