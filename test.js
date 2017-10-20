@@ -5,7 +5,7 @@
 
 const Datastore = require('nedb');
 let db = {};
-db.post_record = new Datastore({ filename: 'data/database/post_record.db', autoload: true });
+db.post_record = new Datastore({ filename: 'data/database/cache.db', autoload: true });
 
 
 function isPosted(id) {
@@ -15,6 +15,7 @@ function isPosted(id) {
             if(err){
                 reject(err);
             }else{
+                console.log(docs);
                 if(docs.length > 0){
                     isPosted = true;
                 }
@@ -34,4 +35,7 @@ async function bbb() {
     let i = await aaa();
     console.log(i);
 }
-(bbb());
+let key = "key";
+db.post_record.find({key:key},function(err,docs){
+  console.log(docs);
+})

@@ -289,7 +289,6 @@ function geneImage(lhb,callback) {
         .drawText(30, 150, "成交额：" + all_amount + "    合计买入：" + lhb.buy_amount + "万元    合计卖出：" +lhb.sell_amount + "万元    净额：" + (parseFloat(lhb.buy_amount) - parseFloat(lhb.sell_amount)).toFixed(2) + "万元")
         .fill("#f5f8fa")
         .drawRectangle(25,170,970,220)
-        .fill("#2f2f2f")
         .drawText(35, 200, "买入金额最大的前5名营业部")
         .drawText(600, 200, "买入额/万")
         .drawText(700, 200, "卖出额/万")
@@ -552,7 +551,7 @@ function _getTodayStockInfo(stock_code) {
     let stock_quote;
         stock_quote = lhb.closing_quote;
     //amplitude振幅
-    if(parseFloat(stock_quote.amplitude) > 12 && parseFloat(stock_quote.amplitude) < 40){
+    if(parseFloat(stock_quote.amplitude) > 12){
         comments.push("主力推动股价巨幅波动走过山车")
     }
     console.log(stock_quote);
@@ -588,18 +587,5 @@ function _getTodayStockInfo(stock_code) {
     }
 
     console.log(comments);
-    return comments.join(", ");
-}
-
-function getMiwen(len) {
-    len = len || 32;
-    var $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var maxPos = $chars.length;
-    var pwd = '';
-    for (var i = 0; i < len; i++) {
-        //0~32的整数
-        pwd += $chars.charAt(Math.floor(Math.random() * (maxPos+1)));
-    }
-    console.log(pwd);
-    return pwd;
+    return comments.join(",");
 }
