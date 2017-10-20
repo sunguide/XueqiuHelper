@@ -93,7 +93,7 @@ module.exports = app => {
                         if (resData.error_code == "20204") {
                             //重发
                             console.log("请重发");
-                            resolve(false)
+                            resolve(-1)
                         } else if (resData.error_code) {
                             resolve(false)
                         } else {
