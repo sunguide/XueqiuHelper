@@ -16,6 +16,47 @@ module.exports = helper = {
       str = md5.digest('hex');
       return str.toUpperCase();
   },
+    //unicode 4E00-9FA5
+
+    randomChinese(length){
+      //unicode
+      let range,rand,min,max;
+      let char = [];
+      let chars = [];
+      for(let i = 0; i < length; i++){
+          //1
+          max = 9;
+          min = 4;
+          range = max - min;
+          rand = Math.random();
+          char[0] = min + Math.round(rand * range);
+          //2
+          max = 15;
+          min = char[0] === 4 ? 14:0;
+          range = max - min;
+          rand = Math.random();
+          char[1] = min + Math.round(rand * range);
+          //3
+          max = char[0] === 9 && char[1] === 15 ? 10:15;
+          min = 0;
+          range = max - min;
+          rand = Math.random();
+          char[2] = min + Math.round(rand * range);
+          //4
+          max = char[0] === 9 && char[1] === 15 && char[2] === 10 ? 5:15;
+          min = 0;
+          range = max - min;
+          rand = Math.random();
+          char[3] = min + Math.round(rand * range);
+
+          for(let k = 0; k < 4;k++){
+              char[k] = char[k].toString(16);
+          }
+          chars.push("\\u" + char.join(''));
+      }
+        return eval("'"+ chars.join('')+ "'");
+
+  },
   datetime(format){
       const moment = require("moment");
       return moment().format(format);

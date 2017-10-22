@@ -11,9 +11,13 @@ module.exports = app => {
             this.ctx.body = "hddd";
         }
         * test(){
+            let info = yield this.ctx.service.xueqiu.chat(3595607502,5981954202,"我们能否合作一下")
+        }
+        * test1(){
 
-          this.ctx.body =  this.ctx.helper.getStockAnchor(600000, 5555);
-
+            const info = yield app.runSchedule('longhubang2');
+            console.log(info);
+            this.ctx.body = info;
         }
         * posters(){
           const _ = require('lodash');
@@ -22,6 +26,61 @@ module.exports = app => {
           this.ctx.body = posters;
           // let result = yield this.service.xueqiu.post("请" +posters + " 来点评一下 $同方股份(SH600100)$ ");
         }
+
+        * test2(){
+            // var t = this, s = jQuery.ajax({
+            //     url: n.getBaseUrl() + "/v2/messages.json?user_id=" + window.SNOWMAN_USER.id,
+            //     type: "POST",
+            //     timeout: 2e4,
+            //     contentType: "application/json",
+            //     data: JSON.stringify(e)
+            // });
+            $.ajax({
+                type: "post",
+                url: "https://im7.xueqiu.com/im-comet/v2/messages.json?user_id=359560750",
+                data:JSON.stringify({
+                    "toId":"5435417380",
+                    "toGroup":false,
+                    "sequenceId": 320852957,
+                    "plain":"明天见"
+                }),
+                timeout: 2e4,
+                contentType: "application/json",
+                success: function (data) {
+                    console.log(data);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(errorThrown);
+                }
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "https://im7.xueqiu.com/im-comet/v2/messages.json?user_id=359560750",
+                data:JSON.stringify({
+                    "plain":"明天见",
+                    "sequenceId": 320852957,
+                    "toGroup":false,
+                    "toId":5435417380,
+                }),
+                timeout: 2e4,
+                contentType: "application/json",
+                success: function (data) {
+                    console.log(data);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(errorThrown);
+                }
+            });
+        }
+
+        var t = this, s = jQuery.ajax({
+        url: "https://im7.xueqiu.com//v2/messages.json?user_id=" + window.SNOWMAN_USER.id,
+        type: "POST",
+        timeout: 2e4,
+        contentType: "application/json",
+        data: '{"toId":5435417380,"toGroup":false,"sequenceId":32085297,"plain":"哈哈哈2"}'
+    });
     }
     return indexController;
 };

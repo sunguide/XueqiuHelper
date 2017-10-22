@@ -17,7 +17,7 @@ module.exports =  {
     const _ = require('lodash');
     if(new Date().getHours() < 16 || new Date().getDay() === 0 || new Date().getDay() === 6){
       logger.info("单日尚未休市或者休市日");
-      return;
+      // return;
     }
     let runKey = "longhubang_run_" + this.ctx.helper.datetime("YYYYMMDD");
     let isRun = yield app.cache.get(runKey);
@@ -31,7 +31,7 @@ module.exports =  {
        logger.info("龙虎榜脚本 已经正在运行，当前work将退出");
        return;
     }
-    let lhbs = yield this.service.longhubang.getLhbs(this.ctx.helper.datetime("YYYY-MM-DD"));
+    let lhbs = yield this.service.longhubang.getLhbs("2017-10-20");
     let identify;
     let result;
     if(lhbs){
@@ -55,6 +55,8 @@ module.exports =  {
             let secret = "<p><br><br><br><br>密文：" + this.ctx.helper.randomChinese(200)+"</p>";
             let message = '<p>' + stock_anchor +lhbs[i].date + '龙虎榜' + '</p><p>上榜理由：'+ lhbs[i].reason
                           + '</p>' + posters + comments + '<div class="img-single-upload"><img src="' + uploadImageURL + '" class="ke_img">' + secret + '</div>',
+
+
             result = yield this.service.xueqiu.post(message);
             if(result){
                 yield this.service.longhubang.setPostedXueqiu(identify,{"message":message},true);

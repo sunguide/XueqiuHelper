@@ -17,6 +17,9 @@ module.exports = appInfo => {
         pageSize: 30,
         serverUrl: 'https://hacker-news.firebaseio.com/v0',
     };
+
+    config.env = "local";
+
     return config;
 };
 exports.mongoose = {
