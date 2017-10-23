@@ -105,25 +105,25 @@ module.exports = app => {
 
         * chat(fromId,toId,message){
             let base_headers = this.base_headers;
-            base_headers.Origin = "https://xueqiu.com";
+            base_headers.Origin = "https://im2.xueqiu.com";
             base_headers.Host = "im2.xueqiu.com";
-            base_headers.Referer = "https://xueqiu.com";
+            base_headers.Referer = "https://im2.xueqiu.com";
             let cookie = yield this.getLoginCookie();
             let form = {
                 "toId":toId,
                 "toGroup":false,
-                "sequenceId": Math.random() * 100000000,
+                "sequenceId": parseInt(Math.random() * 10000000 + "" + 1,10),
                 "plain":message
             };
             request.post("https://im2.xueqiu.com/im-comet/v2/messages.json?user_id="+fromId)
                 .set(base_headers)
                 .set("Cookie", cookie)
-                .type("application/json")
-                .send(form)
+                .set("Content-Type","application/json")
+                .send(JSON.stringify(form))
                 .redirects(0)
                 .end((err, res) => {
                     // let resData = JSON.parse(res.text);
-                    console.log(res.text);
+                    console.log(res.request);
                     return;
                     // if(err){
                     //     reject(err);
@@ -139,18 +139,6 @@ module.exports = app => {
                     //     resolve(true)
                     // }
                 });
-            $.ajax({
-                type: 'POST',
-                url: "https://im8.xueqiu.com/im-comet/v2/messages.json?user_id=3595607502",
-                data: {toId:5435417380,
-                    toGroup:false,
-                    sequenceId:18783231,
-                    plain:"哈000对"},
-                success: function (err,res) {
-                    console.log(res);
-                },
-                dataType: "application/json"
-            });
         }
         * uploadImage(filePath){
             let cookie = yield this.getLoginCookie();
