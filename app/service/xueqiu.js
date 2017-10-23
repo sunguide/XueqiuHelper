@@ -89,7 +89,6 @@ module.exports = app => {
                         if(err){
                             reject(err);
                         }
-                        console.log(res.text);
                         if (resData && resData.error_code == "20204") {
                             //重发
                             console.log("请重发");
@@ -104,6 +103,55 @@ module.exports = app => {
             });
         }
 
+        * chat(fromId,toId,message){
+            let base_headers = this.base_headers;
+            base_headers.Origin = "https://xueqiu.com";
+            base_headers.Host = "im2.xueqiu.com";
+            base_headers.Referer = "https://xueqiu.com";
+            let cookie = yield this.getLoginCookie();
+            let form = {
+                "toId":toId,
+                "toGroup":false,
+                "sequenceId": Math.random() * 100000000,
+                "plain":message
+            };
+            request.post("https://im2.xueqiu.com/im-comet/v2/messages.json?user_id="+fromId)
+                .set(base_headers)
+                .set("Cookie", cookie)
+                .type("application/json")
+                .send(form)
+                .redirects(0)
+                .end((err, res) => {
+                    // let resData = JSON.parse(res.text);
+                    console.log(res.text);
+                    return;
+                    // if(err){
+                    //     reject(err);
+                    // }
+                    // if (resData && resData.error_code == "20204") {
+                    //     //重发
+                    //     console.log("请重发");
+                    //     resolve(-1)
+                    // } else if (resData && resData.error_code) {
+                    //     resolve(false)
+                    // } else {
+                    //     console.log("发布成功");
+                    //     resolve(true)
+                    // }
+                });
+            $.ajax({
+                type: 'POST',
+                url: "https://im8.xueqiu.com/im-comet/v2/messages.json?user_id=3595607502",
+                data: {toId:5435417380,
+                    toGroup:false,
+                    sequenceId:18783231,
+                    plain:"哈000对"},
+                success: function (err,res) {
+                    console.log(res);
+                },
+                dataType: "application/json"
+            });
+        }
         * uploadImage(filePath){
             let cookie = yield this.getLoginCookie();
             let urls = this.urls;
@@ -146,7 +194,6 @@ module.exports = app => {
         }
 
         * getTodayStockInfo(stock_code) {
-            console.log('start');
             let cookie = yield this.getLoginCookie();
             let quote = yield function () {
                 return new Promise(function (resolve, reject) {
@@ -154,10 +201,10 @@ module.exports = app => {
                         .set("Cookie", cookie)
                         .end((err, res) => {
                             let info = JSON.parse(res.text);
-                            info = info[xueqiu.getFullStockCode(stock_code)];
-                            if (err) {
-                                reject(err);
+                            if (err || info.error_code) {
+                                resolve(false);
                             } else {
+                                info = info[xueqiu.getFullStockCode(stock_code)];
                                 resolve(info);
                             }
                         });
@@ -182,11 +229,9 @@ module.exports = app => {
                 return new Promise(function (resolve, reject) {
                     request.get(urls.home)
                         .end((err, res) => {
-                            console.log(res.headers);
                             let cookie = res.headers["set-cookie"].join(",").match(/(xq_a_token=.+?);/)[1];
                             let is_login = res.headers["set-cookie"].join(",").match(/(xq_is_login=.*?);/)[1];
                             if (is_login !== "xq_is_login=") {
-                                console.log('has logined');
                                 resolve(cookie);
                             } else {
                                 request.post(urls.login)
@@ -196,7 +241,6 @@ module.exports = app => {
                                     .send(loginPass)
                                     .redirects(0)
                                     .end((err, res) => {
-                                        console.log(cookie);
                                         if (err) {
                                             reject(err);
                                         }
