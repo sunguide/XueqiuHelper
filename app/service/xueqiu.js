@@ -97,7 +97,7 @@ module.exports = app => {
                         } else if (resData && resData.error_code) {
                             resolve(false)
                         } else {
-                            console.log("发布失败");
+                            console.log("发布成功");
                             resolve(true)
                         }
                     });
