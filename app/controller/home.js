@@ -11,7 +11,7 @@ module.exports = app => {
             this.ctx.body = "hddd";
         }
         * test(){
-            let info = yield this.ctx.service.xueqiu.chat(3595607502,5981954202,"我们能否合作一下")
+            let info = yield this.ctx.service.xueqiu.chat(3595607502,5435417380,"我们能否合作一下")
             this.ctx.body = info;
         }
         * test1(){
@@ -80,13 +80,14 @@ module.exports = app => {
             //     contentType: "application/json",
             //     data: '{"toId":5435417380,"toGroup":false,"sequenceId":32085297,"plain":"哈哈哈2"}'
             // });
-            // jQuery.ajax({
-            //     url: "https://im7.xueqiu.com/im-comet/v2/messages.json?user_id=" + window.SNOWMAN_USER.id,
-            //     type: "POST",
-            //     timeout: 2e4,
-            //     contentType: "application/json",
-            //     data: '{"toId":5435417380,"toGroup":false,"sequenceId":32085299,"plain":"新的一天"}'
-            // });
+            jQuery.ajax({
+                url: "https://im7.xueqiu.com/im-comet/v2/messages.json?user_id=586328842",
+                type: "POST",
+                timeout: 2e4,
+                headers:{Cookie:"xq_a_token=a365d23ab715f9c3b963dc268149f35031ddb8c1"},
+                contentType: "application/json",
+                data: '{"toId":5435417380,"toGroup":false,"sequenceId":32085299,"plain":"新的一天"}'
+            });
         }
 
 

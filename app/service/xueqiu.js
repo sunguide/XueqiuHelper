@@ -104,41 +104,42 @@ module.exports = app => {
         }
 
         * chat(fromId,toId,message){
-            let base_headers = this.base_headers;
-            base_headers.Origin = "https://im2.xueqiu.com";
-            base_headers.Host = "im2.xueqiu.com";
-            base_headers.Referer = "https://im2.xueqiu.com";
+
             let cookie = yield this.getLoginCookie();
-            let form = {
+            let data = {
                 "toId":toId,
                 "toGroup":false,
-                "sequenceId": parseInt(Math.random() * 10000000 + "" + 1,10),
+                "sequenceId": this.getSequenceId(),
                 "plain":message
             };
-            request.post("https://im2.xueqiu.com/im-comet/v2/messages.json?user_id="+fromId)
-                .set(base_headers)
-                .set("Cookie", cookie)
-                .set("Content-Type","application/json")
-                .send(JSON.stringify(form))
-                .redirects(0)
-                .end((err, res) => {
-                    // let resData = JSON.parse(res.text);
-                    console.log(res.request);
-                    return;
-                    // if(err){
-                    //     reject(err);
-                    // }
-                    // if (resData && resData.error_code == "20204") {
-                    //     //重发
-                    //     console.log("请重发");
-                    //     resolve(-1)
-                    // } else if (resData && resData.error_code) {
-                    //     resolve(false)
-                    // } else {
-                    //     console.log("发布成功");
-                    //     resolve(true)
-                    // }
-                });
+            console.log(data);
+            console.log(cookie);
+            return new Promise((resolve, reject) => {
+                request.post("https://im7.xueqiu.com/im-comet/v2/messages.json")
+                    .query({ user_id: fromId })
+                    .set("Cookie",cookie)
+                    .set('Content-Type', 'application/json')
+                    .set('Host','im7.xueqiu.com')
+                    .set('Origin','https://xueqiu.com')
+                    .set('Referer','https://xueqiu.com/')
+                    .set('Content-Type', 'application/json')
+                    .set("User-Agent",'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
+                    .send(JSON.stringify(data))
+                    .withCredentials()
+                    .end(function(err, res){
+                        if (err || !res.ok) {
+                            resolve(false);
+                        } else {
+                            // console.log(res.body);
+                            resolve(true);
+                        }
+                    });
+            });
+
+        }
+
+        getSequenceId(){
+            return parseInt(Math.random() * 10000000 + "" + 1,10);
         }
         * uploadImage(filePath){
             let cookie = yield this.getLoginCookie();

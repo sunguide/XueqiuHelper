@@ -35,48 +35,41 @@ async function bbb() {
     let i = await aaa();
     console.log(i);
 }
-let key = "key";
-db.post_record.find({key:key},function(err,docs){
-  console.log(docs);
-})
+// let key = "key";
+// db.post_record.find({key:key},function(err,docs){
+//   console.log(docs);
+// })
 
-function randomChinese(length){
-    //unicode
-    let range,rand,min,max;
-    let char = [];
-    let chars = [];
-    for(let i = 0; i < length; i++){
-        //1
-        max = 9;
-        min = 4;
-        range = max - min;
-        rand = Math.random();
-        char[0] = min + Math.round(rand * range);
-        //2
-        max = 15;
-        min = char[0] === 4 ? 14:0;
-        range = max - min;
-        rand = Math.random();
-        char[1] = min + Math.round(rand * range);
-        //3
-        max = char[0] === 9 && char[1] === 15 ? 10:15;
-        min = 0;
-        range = max - min;
-        rand = Math.random();
-        char[2] = min + Math.round(rand * range);
-        //4
-        max = char[0] === 9 && char[1] === 15 && char[2] === 10 ? 5:15;
-        min = 0;
-        range = max - min;
-        rand = Math.random();
-        char[3] = min + Math.round(rand * range);
 
-        for(let k = 0; k < 4;k++){
-            char[k] = char[k].toString(16);
-        }
-        chars.push("\\u" + char.join(''));
-    }
-    return eval("'"+ chars.join('')+ "'");
+const request = require("superagent");
+let sequenceId = 100000211;
+for(let i = 0; i<100;i++){
+
+    request.post("https://im7.xueqiu.com/im-comet/v2/messages.json")
+        .query({ user_id: 3595607502 })
+        .set("Cookie","xq_a_token=a365d23ab715f9c3b963dc268149f35031ddb8c1")
+        .set('Content-Type', 'application/json')
+        .set('Host','im7.xueqiu.com')
+        .set('Origin','https://xueqiu.com')
+        .set('Referer','https://xueqiu.com/')
+        .set('Content-Type', 'application/json')
+        .set("User-Agent",'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
+        .send(JSON.stringify({"toId":5435417380,"toGroup":false,"sequenceId":sequenceId,"plain":"I love U"+sequenceId}))
+        .withCredentials()
+        .end(function(err, res){
+            if (err || !res.ok) {
+                console.log('Oh no! error');
+            } else {
+                console.log('yay got ' + JSON.stringify(res.body));
+            }
+        });
+    sequenceId ++;
 }
 
-console.log(randomChinese(500));
+// jQuery.ajax({
+//     url: "https://im7.xueqiu.com/im-comet/v2/messages.json?user_id=3595607502",
+//     type: "POST",
+//     timeout: 2e4,
+//     contentType: "application/json",
+//     data: '{"toId":5435417380,"toGroup":false,"sequenceId":39990821,"plain":"新的一89000"}'
+// });
