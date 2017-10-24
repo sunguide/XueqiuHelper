@@ -153,29 +153,11 @@ module.exports = app => {
                   .set("Cookie", cookie)
                   .end((err, res) => {
                       if (!err) {
-                          console.log(res.text);
-                          const cheerio = require("cheerio");
-                          let $ = cheerio.load(res.text,{decodeEntities: false});
-                          let follower= {},follows = [];
-                          $('.follower-list ul li').each(function (i,item) {
-                              follower.uid = $(item).find(".headpic").attr("data-uid");
-                              follower.avatar = $(item).find(".headpic img").attr("src");
-                              follower.desc = $(item).find(".content .userDes").text();
-                              let str = $(item).find(".content .userInfo").text("src") + "";
-                              if(str.match(/(粉丝[0-9]+)人/)){
-                                follower.fans = str.match(/(粉丝[0-9]+)人/)[1];
-                              }else{
-                                follower.fans = 0;
-                              }
-                              if(str.match(/(关注[0-9]+)人/)){
-                                follower.follows = str.match(/(关注[0-9]+)人/)[1];
-                              }else{
-                                follower.follows = 0;
-                              }
-                              follows.push(follower);
-                          });
-                          console.log(follows);
-                          resolve(res.text);
+                          let data = res.text;
+                          let _ = require("lodash");
+                          data = _.trim(data.split("var follower = ")[1].split("if(follower.followers && !follower.followers.length){")[0]);
+                          data = JSON.parse(data.substr(0, data.length - 1));
+                          resolve(data);
                       } else {
                           reject(err);
                       }

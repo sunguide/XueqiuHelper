@@ -1,10 +1,27 @@
-'use strict';
+
+const request = require("superagent");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
-const request = require("superagent");
+
+// const dom = new JSDOM(``, {
+//     url: "https://example.org/",
+//     referrer: "https://example.com/",
+//     contentType: "text/html",
+//     userAgent: "Mellblomenator/9000",
+//     includeNodeLocations: true
+// });
+
+
+//
+//
+// return;
+
+
 let options = {
-  runScripts: "dangerously"
-}
+    // runScripts: "dangerously", //允许运行js
+    // resources: "usable" //加载外部资源js,css
+};
+//由于雪球使用seajs 无法准确定位加载的动态js，jsdom无法解析
 request.get("https://xueqiu.com/follows")
   .set("Cookie","xq_a_token=a365d23ab715f9c3b963dc268149f35031ddb8c1")
   .end(function(err,res){
