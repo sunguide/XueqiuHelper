@@ -11,8 +11,12 @@ module.exports = app => {
             this.ctx.body = "hddd";
         }
         * test(){
-            let info = yield this.ctx.service.xueqiu.chat(3595607502,5435417380,"我们能否合作一下")
-            this.ctx.body = info;
+          let info = yield this.ctx.service.xueqiu.getFollows(3)
+          this.ctx.body = info;
+        }
+        * test3(){
+          let info = yield this.ctx.service.xueqiu.chat(3595607502,5435417380,"我们能否合作一下")
+          this.ctx.body = info;
         }
         * test1(){
 

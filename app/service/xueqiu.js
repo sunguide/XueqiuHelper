@@ -28,6 +28,7 @@ module.exports = app => {
                 token: "https://xueqiu.com/service/csrf?api=%2Fstatuses%2Fupdate.json&_=1507965835009",
                 post: "https://xueqiu.com/statuses/update.json",
                 upload: "https://xueqiu.com/photo/upload.json",
+                follows: "https://xueqiu.com/follows"
             };
         }
 
@@ -140,6 +141,46 @@ module.exports = app => {
 
         getSequenceId(){
             return parseInt(Math.random() * 10000000 + "" + 1,10);
+        }
+
+        * getFollows(page){
+          let cookie = yield this.getLoginCookie();
+          let base_headers = this.base_headers;
+          let urls = this.urls;
+          return new Promise(function (resolve, reject) {
+              request.get(urls.follows + (page ? "?page=" + page:""))
+                  .set(base_headers)
+                  .set("Cookie", cookie)
+                  .end((err, res) => {
+                      if (!err) {
+                          console.log(res.text);
+                          const cheerio = require("cheerio");
+                          let $ = cheerio.load(res.text,{decodeEntities: false});
+                          let follower= {},follows = [];
+                          $('.follower-list ul li').each(function (i,item) {
+                              follower.uid = $(item).find(".headpic").attr("data-uid");
+                              follower.avatar = $(item).find(".headpic img").attr("src");
+                              follower.desc = $(item).find(".content .userDes").text();
+                              let str = $(item).find(".content .userInfo").text("src") + "";
+                              if(str.match(/(粉丝[0-9]+)人/)){
+                                follower.fans = str.match(/(粉丝[0-9]+)人/)[1];
+                              }else{
+                                follower.fans = 0;
+                              }
+                              if(str.match(/(关注[0-9]+)人/)){
+                                follower.follows = str.match(/(关注[0-9]+)人/)[1];
+                              }else{
+                                follower.follows = 0;
+                              }
+                              follows.push(follower);
+                          });
+                          console.log(follows);
+                          resolve(res.text);
+                      } else {
+                          reject(err);
+                      }
+                  });
+          });
         }
         * uploadImage(filePath){
             let cookie = yield this.getLoginCookie();
