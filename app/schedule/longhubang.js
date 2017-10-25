@@ -43,9 +43,12 @@ module.exports =  {
             if(isPosted) continue;
             lhbs[i].identify = (lhbs[i].date).replace(new RegExp("-","gm"),"") + "_" + lhbs[i].stock_code + "_" + identify;
             lhbs[i].comments = yield this.service.longhubang.analyze(lhbs[i]);
-            let posters = yield this.service.xueqiu.getRecentPoster(lhbs[i].stock_code);
-            if(posters){
-                posters = "<p>[鼓鼓掌][鼓鼓掌][鼓鼓掌]有请股友@" + _.chunk(posters,5)[0].join(", @") + " 来点评一下今日的龙虎榜单[献花花][献花花][献花花]</p>";
+            //当买入小于五个营业部的时候，不@，说明是新股，一字板
+            if(lhbs[i].buy_details.length === 5){
+              let posters = yield this.service.xueqiu.getRecentPoster(lhbs[i].stock_code);
+              if(posters){
+                  posters = "<p>[鼓鼓掌][鼓鼓掌][鼓鼓掌]有请股友@" + _.chunk(posters,5)[0].join(", @") + " 来点评一下今日的龙虎榜单[献花花][献花花][献花花]</p>";
+              }
             }
 
             let imagePath = yield this.service.longhubang.geneImage(lhbs[i]);
