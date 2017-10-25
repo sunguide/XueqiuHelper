@@ -225,8 +225,9 @@ module.exports = app => {
             return quote;
         }
 
-        * getLoginCookie() {
+        * getLoginCookie(options) {
             if (this.cookie) {
+                console.log("login cookie from this")
                 return this.cookie;
             }
             let urls = this.urls;
@@ -236,6 +237,10 @@ module.exports = app => {
                 password: "woshini8",
                 captcha: ""
             };
+            if(options){
+              loginPass.username = options.username;
+              loginPass.password = options.password;
+            }
             let base_headers = this.base_headers;
             return this.cookie = yield function () {
                 return new Promise(function (resolve, reject) {

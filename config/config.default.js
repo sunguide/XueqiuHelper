@@ -19,13 +19,14 @@ module.exports = appInfo => {
     };
 
     config.env = "local";
-
+    
+    config.mongoose = {
+        url: 'mongodb://10.0.30.61/xueqiu_helper',
+        options: {}
+    };
     return config;
 };
-exports.mongoose = {
-    url: 'mongodb://127.0.0.1/example',
-    options: {}
-};
+
 //
 // module.exports = {
 //   // 配置需要的中间件，数组顺序即为中间件的加载顺序
