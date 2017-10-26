@@ -4,13 +4,32 @@ module.exports = app => {
     class indexController extends app.Controller {
         * index() {
             // this.ctx.body = "fuck ";
-
-            let data = {}
+            this.ctx.session.nickname = "ddd";
+            let data = {nickname:this.ctx.session.nickname}
             yield this.ctx.render('home/index.tpl', data);
         }
         * test(){
           let info = yield this.ctx.service.xueqiu.getFollows(3)
           this.ctx.body = info;
+        }
+
+        * login(){
+            yield this.ctx.render('home/login.tpl');
+        }
+
+        * loginDo(){
+            let loginPass = {
+                username:this.ctx.request.body.username,
+                password:this.ctx.request.body.password,
+            };
+            let info = yield this.ctx.service.xueqiu.getLogin(loginPass.username,loginPass.password);
+            if(info){
+                this.ctx.session.uid = info.uid;
+                this.ctx.session.nickname = info.user.screen_name;
+                this.ctx.session.avatar = info.user.photo_domain + info.user.profile_image_url.split(',')[0];
+                this.ctx.session.xq_a_token = info.access_token;
+            }
+            this.ctx.body = info;
         }
         * test3(){
           let info = yield this.ctx.service.xueqiu.chat(3595607502,5435417380,"我们能否合作一下")

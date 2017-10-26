@@ -5,6 +5,12 @@ module.exports = app => {
         * index() {
             this.ctx.body = "hddd";
         }
+
+        * messages(req,res){
+            let receivers = this.ctx.request.body.receiver;
+            this.ctx.body = receivers;
+
+        }
         * test(ctx){
             let usermodel = new ctx.model.XueqiuUser({"userName":"何丽丽","password":"******"});
             yield usermodel.save();

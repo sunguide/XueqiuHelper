@@ -277,14 +277,30 @@ ul.nav li{
 .aside-left-nav dt{
     padding-bottom: 10px;
     font-weight: 500;
-    font-size: 16px;
+    font-size: 18px;
     color: #333;
+}
+.aside-left-nav dd{
+    margin-bottom: 30px;
 }
 .aside-left-nav dd ul{
     padding-left: 0;
 }
 .aside-left-nav a{
+    font-size: 14px;
+    color: #585858;
+    height: 30px;
+    line-height: 30px;
     text-overflow:ellipsis; white-space:nowrap; overflow:hidden;
+}
+.aside-left-nav ul li a:hover {
+    color: #22ab28;
+    transition: 0.3s color;
+}
+
+
+label{
+    font-weight:500;
 }
 .anchor-fix:target{
     padding-top:80px;
@@ -299,4 +315,82 @@ ul.nav li{
 }
 .about-container p{
     margin-top: 80px;
+}
+
+
+
+/* home/index.js*/
+
+.multi-message{
+    margin-top: 30px;
+}
+
+/*login*/
+
+.login-container{
+    margin-top: 150px;
+}
+.login-container .inner{
+    max-width: 360px;
+    margin: 0 auto;
+}
+.login-container .form-group input[type='email'], .login-container .form-group input[type='text'], .login-container .form-group input[type='password'] {
+    padding: 18px 20px ;
+    display: block;
+    width: 100%;
+    height: 50px;
+    border-radius: 5px;
+    border: 1px solid #BABFC3;
+    background-color: #fff;
+    position: relative;
+    z-index: 2;
+}
+
+.login-container .action button, .login-container .action .btn {
+    padding: 13px 20px;
+    display: block;
+    width: 100%;
+    height: 50px;
+    border-radius: 5px;
+    border: none;
+    font-size: 18px;
+    background:  #4343E0;;
+}
+
+.login-container .action .btn-reg {
+    padding: 13px 20px;
+    display: block;
+    width: 100%;
+    height: 50px;
+    border-radius: 5px;
+    border: none;
+    font-size: 18px;
+    color: #ffffff;
+    background:  #4343E0;;
+}
+
+.login-container .form-behavior {
+    overflow: hidden;
+    margin-bottom: 75px;
+}
+.login-container .form-behavior span {
+    font-size: 24px;
+}
+
+.divider{
+    text-align: center;
+}
+.divider span {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 8px 40px;
+}
+.divider:before, .divider:after {
+    content: ' ';
+    display: inline-block;
+    vertical-align: middle;
+    width: 30%;
+    height: 1px;
+    background-color: #BABFC3;
+    /*margin: 0 0% 0 -50%;*/
 }

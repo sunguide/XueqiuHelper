@@ -12,30 +12,26 @@
                     </ul>
                 </div>
                 <dl>
-                    <dt><a href="/languages">消息</a></dt>
+                    <dt>消息</dt>
+                    <dd>
+                        <ul>
+                            <li><a href="/zh-cn/intro/index.html">Egg.js 是什么?</a></li>
+                            <li><a href="/zh-cn/intro/egg-and-koa.html">Egg.js 和 Koa</a></li>
+                            <li><a href="/zh-cn/intro/quickstart.html">快速入门</a></li>
+                        </ul>
+                    </dd>
                 </dl>
             </aside>
         </div>
         <div class="col-lg-9 col-md-9 col-sm-9">
-          <div class="form-group">
-            <label for="exampleInputEmail1">Email address</label>
-            <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
-          </div>
-            {% for category in categories %}
-            <div class="col-lg-3 col-md-3 col-sm-3">
-                <a href="{{ category.url }}">
-                    <div class="box">
-                        <img src="{{ category.img }}" >
-                        <div class="caption">
-                            <h3>{{ category.title }}</h3>
-                            <p>{{ category.introduce }}</p>
-                        </div>
-                    </div>
-                </a>
+            <div class="multi-message">
+                <div class="form-group">
+                    <label for="receiver">接收人昵称或者uid</label>
+                    <textarea type="text" rows="20" class="form-control" id="receiver" placeholder="多个用英文,分开"></textarea>
+                </div>
+                <button type="button" id="send-message" class="btn btn-primary">发送</button>
             </div>
-            {% endfor %}
         </div>
     </div>
-
 </div>
 {% endblock %}

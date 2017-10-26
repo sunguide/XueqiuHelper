@@ -6,6 +6,9 @@ module.exports = app => {
 
   app.get('/api', 'api.index');
   app.get('/api/test', 'api.test');
+  app.post('/api/messages', 'api.messages');
+  app.get('/login', 'home.login');
+  app.post('/login', 'home.loginDo');
   // app.get('/api/idCard', 'api.idCard');
   // app.get('/api/ip', 'api.ip');
   // app.get('/api/tinyurl', 'api.tinyURL');

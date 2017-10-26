@@ -225,6 +225,26 @@ module.exports = app => {
             return quote;
         }
 
+        * getUserInfo(uid){
+            const jsdom = require("jsdom");
+            const { JSDOM } = jsdom;
+            return new Promise(function (resolve, reject) {
+                request.get("https://xueqiu.com/u/" + uid)
+                    .end((err, res) => {
+                        let options = {
+                            runScripts: "dangerously", //允许运行js
+                            // resources: "usable" //加载外部资源js,css
+                        };
+                        if(err){
+                            reject(err);
+                        }else{
+                            const dom = new JSDOM(res.text, options);
+                            resolve(dom.window.SNOWMAN_TARGET);
+                        }
+                    });
+            });
+        }
+
         * getLoginCookie(options) {
             if (this.cookie) {
                 console.log("login cookie from this")
@@ -274,6 +294,39 @@ module.exports = app => {
                 });
             }();
         }
+        * getLogin(username,password) {
+            let urls = this.urls;
+            let loginPass = {};
+            loginPass.username = username;
+            loginPass.password = password;
+            let base_headers = this.base_headers;
+            return new Promise(function (resolve, reject) {
+                request.get(urls.home)
+                    .end((err, res) => {
+                        let cookie = res.headers["set-cookie"].join(",").match(/(xq_a_token=.+?);/)[1];
+                        let is_login = res.headers["set-cookie"].join(",").match(/(xq_is_login=.*?);/)[1];
+                        request.post(urls.login)
+                            .set(base_headers)
+                            .set("Cookie", cookie)
+                            .type("form")
+                            .send(loginPass)
+                            .redirects(0)
+                            .end((err, res) => {
+                                if (err) {
+                                    reject(err);
+                                }
+                                let loginData = JSON.parse(res.text);
+                                if (loginData.access_token) {
+                                    resolve(loginData);
+                                } else {
+                                    reject("login fail");
+                                }
+                            });
+
+                    });
+            });
+        }
+
         static getFullStockCode(stock_code) {
             if (stock_code < "600000") {
                 return "SZ" + stock_code;
