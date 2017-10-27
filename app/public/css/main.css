@@ -42,13 +42,16 @@ sup{
 
 }
 #header ul{
-    padding: 20px 0 10px 0;
+    padding: 0;
+    margin-bottom: 0;
+    height: 55px;
 }
 #header li{
     margin: 0;
     font-size: 15px;
     letter-spacing: 0.5px;
     display: inline-block;
+    height: 35px;
 }
 #header .logo{
     font-weight: 400;
@@ -65,7 +68,7 @@ sup{
 }
 
 #header a{
-    color: #555567;
+    color: #fff;
     text-decoration: none;
     -webkit-transition-property: all;
     transition-property: all;
@@ -78,6 +81,10 @@ sup{
     color: #20a0ff;
     border-bottom: 2px solid #20a0ff;
     padding-bottom: 22px;
+}
+#header .avatar {
+  height: 45px;
+  margin-top: 10px;
 }
 .menu a{
     margin: 0 20px;

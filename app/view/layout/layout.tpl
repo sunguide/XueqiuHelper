@@ -21,7 +21,13 @@
             <div class="menu">
                 <ul>
                     <li style="margin-right: 100px"><span>雪球助手，您的财富帮手</span></li>
-                    <li><span>{{ ctx.session.nickname }}<img src="{{ ctx.session.avatar }}"/></span></li>
+                    <li>
+                      {% if ctx.session.uid %}
+                          <span>{{ ctx.session.nickname }}</span><img class="avatar" src="{{ ctx.session.avatar }}"/>
+                      {% else %}
+                          <span><a href="/login">登录</a></span>
+                      {% endif %}
+                    </li>
                 </ul>
             </div>
 

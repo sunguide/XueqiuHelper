@@ -27,7 +27,11 @@
             <div class="multi-message">
                 <div class="form-group">
                     <label for="receiver">接收人昵称或者uid</label>
-                    <textarea type="text" rows="20" class="form-control" id="receiver" placeholder="多个用英文,分开"></textarea>
+                    <textarea type="text" rows="12" class="form-control" id="receiver" placeholder="多个用英文,分开"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="message">消息内容</label>
+                    <textarea type="text" rows="6" class="form-control" id="message" placeholder="请输入发送的消息内容"></textarea>
                 </div>
                 <button type="button" id="send-message" class="btn btn-primary">发送</button>
             </div>

@@ -4,7 +4,6 @@ module.exports = app => {
     class indexController extends app.Controller {
         * index() {
             // this.ctx.body = "fuck ";
-            this.ctx.session.nickname = "ddd";
             let data = {nickname:this.ctx.session.nickname}
             yield this.ctx.render('home/index.tpl', data);
         }

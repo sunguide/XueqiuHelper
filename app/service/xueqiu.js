@@ -245,6 +245,24 @@ module.exports = app => {
             });
         }
 
+        * getUserInfoByNickname(nickname){
+          // https://xueqiu.com/users/search/suggest.json?q=%E7%94%A8%E6%88%B7&count=3&_=1509093180649
+          return new Promise(function (resolve, reject) {
+              request.get("https://xueqiu.com/users/search/suggest.json?q=" + nickname + "&count=1&_=" + Date.now())
+                  .end((err, res) => {
+                      if(err){
+                          reject(err);
+                      }else{
+                          let data = JSON.parse(res.text);
+                          if(data && data.users){
+                              resolve(data.users[0]);
+                          }else{
+                              resolve(false);
+                          }
+                      }
+                  });
+          });
+        }
         * getLoginCookie(options) {
             if (this.cookie) {
                 console.log("login cookie from this")
