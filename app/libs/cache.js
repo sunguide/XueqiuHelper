@@ -1,7 +1,7 @@
 'use strict';
 const path = require("path")
 const Datastore = require('nedb');
-const db = new Datastore({ filename: './data/database/cache.db', autoload: true });
+const db = new Datastore({ filename: './data/database/cache.db', autoload: false });
 
 module.exports =  {
     set: function (key, value, ttl){
@@ -12,6 +12,7 @@ module.exports =  {
                 ttl = 0;
             }
             let data = { key: key, value:value, ttl: ttl };
+            db.loadDatabase();
             db.find({key:key}, function (err, docs) {
                 if(err){
                     reject(err);
@@ -31,7 +32,7 @@ module.exports =  {
     },
     get:function (key){
         return new Promise((resolve, reject) => {
-          console.log("get:");
+            db.loadDatabase();
             db.find({key:key},function (err, docs) {
                 if(err){
                     reject(err);
@@ -40,7 +41,6 @@ module.exports =  {
                     if(docs.length > 0 && (!docs[0].ttl || docs[0].ttl >= Date.now())){
                         doc = docs[0]['value'];
                     }
-                    console.log(doc);
                     resolve(doc);
                 }
             });

@@ -11,6 +11,7 @@
     "egg-bin": "^4.3.5",
     "egg-mock": "^3.13.1",
     "egg-mongoose": "^2.1.1",
+    "egg-scripts": "^2.1.0",
     "egg-view-nunjucks": "^2.1.4",
     "gm": "^1.23.0",
     "iconv-lite": "^0.4.19",
@@ -27,7 +28,8 @@
     "grunt-contrib-jshint": "^1.1.0"
   },
   "scripts": {
-    "start": "node index.js",
+    "start": "egg-scripts start --daemon",
+    "stop": "egg-scripts stop",
     "dev": "egg-bin dev && open http://localhost:7001/",
     "test": "egg-bin test"
   }

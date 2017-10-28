@@ -67,10 +67,10 @@ module.exports = app => {
                   }
                }
             }
-            return posters;_.uniq(posters);
+            return _.uniq(posters);
         }
 
-        * post(message) {
+        * post(message,title) {
             let urls = this.urls;
             let token = yield this.getToken();
             let base_headers = this.base_headers;
@@ -79,6 +79,17 @@ module.exports = app => {
                 "status": message,
                 "session_token": token
             };
+            if(title){
+                form = {
+                    "status": message,
+                    "title": title,
+                    "original":0,
+                    "right":true,
+                    "session_token": token
+                };
+                base_headers.Referer = "https://xueqiu.com/write";
+            }
+
             return new Promise((resolve, reject) => {
                 request.post(urls.post)
                     .set(base_headers)
@@ -104,19 +115,19 @@ module.exports = app => {
             });
         }
 
-        * chat(fromId,toId,message){
-
-            let cookie = yield this.getLoginCookie();
+        * chat(fromId,toId,message,cookie){
+            if(!cookie){
+                cookie = yield this.getLoginCookie();
+            }
             let data = {
                 "toId":toId,
                 "toGroup":false,
                 "sequenceId": this.getSequenceId(),
                 "plain":message
             };
-            console.log(data);
-            console.log(cookie);
+            let ctx = this.ctx;
             return new Promise((resolve, reject) => {
-                request.post("https://im7.xueqiu.com/im-comet/v2/messages.json")
+                request.post("https://im" + Math.round(9 * Math.random()) + ".xueqiu.com/im-comet/v2/messages.json")
                     .query({ user_id: fromId })
                     .set("Cookie",cookie)
                     .set('Content-Type', 'application/json')
@@ -128,12 +139,17 @@ module.exports = app => {
                     .send(JSON.stringify(data))
                     .withCredentials()
                     .end(function(err, res){
+                        let result = true;
                         if (err || !res.ok) {
-                            resolve(false);
-                        } else {
-                            // console.log(res.body);
-                            resolve(true);
+                            result = false;
                         }
+                        //保存记录
+                        data.fromId = fromId;
+                        data.success = result;
+                        data.created = Date.now();
+                        let model = new ctx.model.MessageRecord(data);
+                        model.save();
+                        resolve(result);
                     });
             });
 
@@ -246,9 +262,13 @@ module.exports = app => {
         }
 
         * getUserInfoByNickname(nickname){
-          // https://xueqiu.com/users/search/suggest.json?q=%E7%94%A8%E6%88%B7&count=3&_=1509093180649
-          return new Promise(function (resolve, reject) {
-              request.get("https://xueqiu.com/users/search/suggest.json?q=" + nickname + "&count=1&_=" + Date.now())
+            let cookie = yield this.getLoginCookie();
+            let base_headers = this.base_headers;
+            let url = "https://xueqiu.com/users/search/suggest.json?q=" + encodeURI(nickname) + "&count=1&_=" + Date.now();
+            return new Promise(function (resolve, reject) {
+              request.get(url)
+                  .set(base_headers)
+                  .set("Cookie", cookie)
                   .end((err, res) => {
                       if(err){
                           reject(err);

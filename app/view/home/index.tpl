@@ -8,16 +8,15 @@
             <aside class="aside-left-nav">
                 <div class="mobile-menu">
                     <ul>
-                        <li><a href="/">Home</a></li>
+                        <li><a href="/">首页</a></li>
                     </ul>
                 </div>
                 <dl>
-                    <dt>消息</dt>
+                    <dt>消息服务</dt>
                     <dd>
                         <ul>
-                            <li><a href="/zh-cn/intro/index.html">Egg.js 是什么?</a></li>
-                            <li><a href="/zh-cn/intro/egg-and-koa.html">Egg.js 和 Koa</a></li>
-                            <li><a href="/zh-cn/intro/quickstart.html">快速入门</a></li>
+                            <li><a href="/messages">群发消息</a></li>
+                            <li><a href="/post">定时发帖</a></li>
                         </ul>
                     </dd>
                 </dl>

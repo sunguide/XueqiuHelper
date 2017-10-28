@@ -41,18 +41,12 @@ sup{
     color:#fff;
 
 }
-#header ul{
+#header .menu{
     padding: 0;
     margin-bottom: 0;
     height: 55px;
 }
-#header li{
-    margin: 0;
-    font-size: 15px;
-    letter-spacing: 0.5px;
-    display: inline-block;
-    height: 35px;
-}
+
 #header .logo{
     font-weight: 400;
     font-family: 'Ubuntu', sans-serif;
@@ -66,8 +60,16 @@ sup{
     float: left!important;
     margin: 0;
 }
+#header li.menu-item {
+    margin: 0;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    height: 35px;
+    margin-top: 10px;
+}
 
-#header a{
+#header .logo a{
     color: #fff;
     text-decoration: none;
     -webkit-transition-property: all;
@@ -77,20 +79,22 @@ sup{
     border-bottom: 2px solid rgba(0,0,0,0);
     padding-bottom: 2px;
 }
-#header a:hover{
+#header .logo a:hover{
     color: #20a0ff;
     border-bottom: 2px solid #20a0ff;
     padding-bottom: 22px;
 }
 #header .avatar {
-  height: 45px;
-  margin-top: 10px;
+  height: 40px;
 }
 .menu a{
     margin: 0 20px;
 }
 .button a{
     margin: 0;
+}
+.inline-block{
+    display: inline-block;
 }
 #header .choose{
     color: #FF7D46;

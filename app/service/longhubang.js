@@ -227,7 +227,6 @@ module.exports = app => {
                app.cache.set("quote_" + lhb.stock_code, stock_quote, 60000);
             }
             let departments = this.getDepartments();
-            console.log(departments);
             //分析买入榜
             //模型一，买一主买封涨停
             //模型二，卖一砸盘封跌停
@@ -349,7 +348,7 @@ module.exports = app => {
                 {"华泰证券南京六合彤华街证券营业部":"知名游资『桃仙大神龙飞虎』"},
                 {"光大证券股份有限公司杭州庆春路证券营业部":"知名游资"},
                 {"华泰证券股份有限公司上海武定路证券营业部":"新生代游资"},
-                {"华泰证券股份有限公司北京雍和宫证券营业部龙虎榜数据":"牛散唐汉若"}
+                {"华泰证券股份有限公司北京雍和宫证券营业部":"牛散唐汉若"}
             ];
         }
     }

@@ -2,6 +2,8 @@
 
 module.exports = app => {
   app.get('/', 'home.index');
+  app.get('/messages', 'home.index');
+  app.get('/messages/schedule', 'home.index');
   app.get('/test', 'home.test');
 
   app.get('/api', 'api.index');

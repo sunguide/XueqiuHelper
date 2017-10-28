@@ -2,6 +2,7 @@
 $(function () {
     $("#send-message").click(function () {
         let receiver = $("#receiver").val();
+        let message = $("#message").val();
         let csrftoken = $.cookie('csrfToken');
         function csrfSafeMethod(method) {
             // these HTTP methods do not require CSRF protection
@@ -14,7 +15,7 @@ $(function () {
                 }
             },
         });
-        $.post("/api/messages",{receiver:receiver},function (err,res) {
+        $.post("/api/messages",{receiver:receiver,message:message},function (err,res) {
             if(err){
                 console.log(err);
             }else{
