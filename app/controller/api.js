@@ -6,39 +6,40 @@ module.exports = app => {
             this.ctx.body = "hddd";
         }
 
-        * messages(req,res){
+        * messages(req, res) {
             const _ = require("lodash");
             let receivers = this.ctx.request.body.receiver;
             let message = _.trim(this.ctx.request.body.message);
             let fromId = this.ctx.session.uid;
-            let userInfo,toId;
-            if(receivers && message){
-               receivers = receivers.split(",");
-               if(receivers){
+            let userInfo, toId;
+            if (receivers && message) {
+                receivers = receivers.split(",");
+                if (receivers) {
 
-                   for(let i = 0; i < receivers.length; i++){
-                       if(isNaN(receivers[i])){
-                         userInfo = yield this.ctx.service.xueqiu.getUserInfoByNickname(receivers[i]);
-                         if(userInfo){
-                             toId = userInfo['id'];
-                         }else{
-                             console.log("user:" + receivers[i] + " not exist")
-                             continue;
-                         }
-                     }else{
-                         toId = receivers[i];
-                     }
-                     yield this.ctx.service.xueqiu.chat(fromId,toId,message);
-                  }
-               }
+                    for (let i = 0; i < receivers.length; i++) {
+                        if (isNaN(receivers[i])) {
+                            userInfo = yield this.ctx.service.xueqiu.getUserInfoByNickname(receivers[i]);
+                            if (userInfo) {
+                                toId = userInfo['id'];
+                            } else {
+                                console.log("user:" + receivers[i] + " not exist")
+                                continue;
+                            }
+                        } else {
+                            toId = receivers[i];
+                        }
+                        yield this.ctx.service.xueqiu.chat(fromId, toId, message, "xq_a_token=" + this.ctx.session.xq_a_token);
+                    }
+                }
             }
-            this.ctx.body = receivers;
+            this.success({},"已经加入到发送队列中");
         }
-        * test(ctx){
+
+        * test(ctx) {
 
             let departments = this.ctx.service.longhubang.getDepartments();
-            for(let i = 0; i < departments.length;i++){
-                if(departments[i]['中信证券上海古北路证券营业部']){
+            for (let i = 0; i < departments.length; i++) {
+                if (departments[i]['中信证券上海古北路证券营业部']) {
                     this.ctx.body = departments[i]['中信证券上海古北路证券营业部'];
                 }
             }

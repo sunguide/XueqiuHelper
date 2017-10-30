@@ -25,7 +25,7 @@
         <div class="col-lg-9 col-md-9 col-sm-9">
             <div class="multi-message">
                 <div class="form-group">
-                    <label for="receiver">接收人昵称或者uid</label>
+                    <label for="receiver">接收人昵称或者uid（非好友也可以收到）</label>
                     <textarea type="text" rows="12" class="form-control" id="receiver" placeholder="多个用英文,分开"></textarea>
                 </div>
                 <div class="form-group">
@@ -37,4 +37,5 @@
         </div>
     </div>
 </div>
+
 {% endblock %}

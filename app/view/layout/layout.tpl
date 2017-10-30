@@ -57,7 +57,7 @@
             </div>
         </div>
     </div>
-
+<div class="hide" id="toast-message">{{ toast }}</div>
 </div>
 <!--javascript-->
 <script src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>

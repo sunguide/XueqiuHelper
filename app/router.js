@@ -11,6 +11,7 @@ module.exports = app => {
   app.post('/api/messages', 'api.messages');
   app.get('/login', 'home.login');
   app.post('/login', 'home.loginDo');
+  app.get('/logout', 'home.logout');
   // app.get('/api/idCard', 'api.idCard');
   // app.get('/api/ip', 'api.ip');
   // app.get('/api/tinyurl', 'api.tinyURL');

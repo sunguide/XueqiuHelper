@@ -66,7 +66,18 @@ sup{
     letter-spacing: 0.5px;
     display: inline-block;
     height: 35px;
-    margin-top: 10px;
+    padding: 10px;
+    line-height: 35px;
+}
+
+#header li span a{
+    color:#fff;
+}
+
+#header li  span a:hover{
+    color: #20a0ff;
+    border-bottom: 2px solid #20a0ff;
+    padding-bottom: 20px;
 }
 
 #header .logo a{
@@ -82,7 +93,7 @@ sup{
 #header .logo a:hover{
     color: #20a0ff;
     border-bottom: 2px solid #20a0ff;
-    padding-bottom: 22px;
+    padding-bottom: 20px;
 }
 #header .avatar {
   height: 40px;
@@ -404,4 +415,27 @@ label{
     height: 1px;
     background-color: #BABFC3;
     /*margin: 0 0% 0 -50%;*/
+}
+
+
+.toast-dialog .modal-dialog{
+    width: 400px;
+}
+.toast-dialog .modal-content{
+    width: 400px;
+    margin: 180px auto;
+}
+.toast-dialog .modal-content .modal-header{
+    border-bottom: 0;
+}
+
+.toast-dialog .modal-content .modal-body{
+    padding: 15px  15px 60px
+}
+
+.toast-dialog .modal-content .modal-body p {
+    text-align: center;
+}
+.toast-dialog .close{
+    font-weight: 100;
 }

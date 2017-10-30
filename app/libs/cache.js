@@ -1,5 +1,4 @@
 'use strict';
-const path = require("path")
 const Datastore = require('nedb');
 const db = new Datastore({ filename: './data/database/cache.db', autoload: false });
 

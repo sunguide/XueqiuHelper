@@ -116,6 +116,7 @@ module.exports = app => {
         }
 
         * chat(fromId,toId,message,cookie){
+            console.log(cookie)
             if(!cookie){
                 cookie = yield this.getLoginCookie();
             }
@@ -147,8 +148,14 @@ module.exports = app => {
                         data.fromId = fromId;
                         data.success = result;
                         data.created = Date.now();
-                        let model = new ctx.model.MessageRecord(data);
-                        model.save();
+                        //mongodb
+                        // let model = new ctx.model.MessageRecord(data);
+                        // model.save();
+            console.log(data);
+                        //nedb
+                        const Datastore = require('nedb');
+                        const db = new Datastore({ filename: './data/database/message_record.db', autoload: true });
+                        db.insert(data);
                         resolve(result);
                     });
             });
@@ -357,7 +364,7 @@ module.exports = app => {
                                 if (loginData.access_token) {
                                     resolve(loginData);
                                 } else {
-                                    reject("login fail");
+                                    resolve(false);
                                 }
                             });
 

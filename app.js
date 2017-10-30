@@ -5,10 +5,12 @@ module.exports = app => {
         get uid() {
             return this.ctx.session.uid;
         }
-        success(data) {
+        success(data,message) {
+            message = message || "操作成功";
             this.ctx.body = {
                 success: true,
                 data,
+                message
             };
         }
         error(msg) {

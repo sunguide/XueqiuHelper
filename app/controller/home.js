@@ -4,7 +4,7 @@ module.exports = app => {
     class indexController extends app.Controller {
         * index() {
             // this.ctx.body = "fuck ";
-            let data = {nickname:this.ctx.session.nickname}
+            let data = {nickname:this.ctx.session.nickname};
             yield this.ctx.render('home/index.tpl', data);
         }
         * test(){
@@ -27,9 +27,34 @@ module.exports = app => {
                 this.ctx.session.nickname = info.user.screen_name;
                 this.ctx.session.avatar = info.user.photo_domain + info.user.profile_image_url.split(',')[0];
                 this.ctx.session.xq_a_token = info.access_token;
+                const Datastore = require('nedb');
+                const db = new Datastore({ filename: './data/database/user.db', autoload: true });
+                info.user.access_token = info.access_token;
+                info.user.refresh_token = info.refresh_token;
+                db.find({"id":info.uid},function (err,docs) {
+                    if(docs.length > 0){
+                        db.update({"id":info.uid},{$set:info.user});
+                    }else{
+                        db.insert(info.user,function (err) {
+                            console.log(err);
+                        });
+                    }
+                });
+                this.ctx.body = info;
+            }else{
+                yield this.ctx.render('home/login.tpl',{"toast":"用户名和密码错误，请输入雪球用户名和密码！"});
+                // this.error("用户名和密码错误，请输入雪球用户名和密码！")
             }
-            this.ctx.body = info;
         }
+
+        * logout(){
+            this.ctx.session.uid = 0;
+            this.ctx.session.nickname = '';
+            this.ctx.session.avatar = '';
+            this.ctx.session.xq_a_token = '';
+            this.ctx.redirect('/');
+        }
+
         * test3(){
           let info = yield this.ctx.service.xueqiu.chat(3595607502,5435417380,"我们能否合作一下")
           this.ctx.body = info;
