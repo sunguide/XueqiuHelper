@@ -30,7 +30,7 @@ module.exports = app => {
                 const Datastore = require('nedb');
                 const db = new Datastore({ filename: './data/database/user.db', autoload: true });
                 info.user.access_token = info.access_token;
-                .
+
                 info.user.refresh_token = info.refresh_token;
                 db.find({"id":info.uid},function (err,docs) {
                     if(docs.length > 0){

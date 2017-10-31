@@ -209,6 +209,18 @@ module.exports = app => {
             });
         }
 
+        * request(url,cookie){
+            if(!cookie){
+                cookie = yield this.getLoginCookie();
+            }
+            return new Promise(function (resolve, reject) {
+                request.get(url)
+                    .set("Cookie", cookie)
+                    .end((err, res) => {
+                        resolve(res.text);
+                    });
+            });
+        }
         * getToken() {
             let cookie = yield this.getLoginCookie();
             let base_headers = this.base_headers;
