@@ -99,7 +99,7 @@ module.exports = app => {
                     .end((err, res) => {
                         let resData = JSON.parse(res.text);
                         if(err){
-                            reject(err);
+                            resolve(false);
                         }
                         if (resData && resData.error_code == "20204") {
                             //重发

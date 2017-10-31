@@ -66,8 +66,8 @@ module.exports = {
                     secret = "<p><br><br><br><br>" + tips + "</p>";
                 }
                 let date = moment(lhbs[i].date).format("YYYY年MM月DD日");
-                let title = stock_anchor + date + '龙虎榜';
-                let message = '<p>上榜理由：' + lhbs[i].reason
+                let title = lhbs[i].stock_name + date + '龙虎榜';
+                let message = '<p>'+stock_anchor+'上榜理由：' + lhbs[i].reason
                         + '</p>' + posters + comments + '<div class="img-single-upload"><img src="' + uploadImageURL + '" class="ke_img">' + secret + '</div>',
                     result = yield this.service.xueqiu.post(message,title);
                 if (result) {

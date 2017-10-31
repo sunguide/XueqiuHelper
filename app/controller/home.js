@@ -30,6 +30,7 @@ module.exports = app => {
                 const Datastore = require('nedb');
                 const db = new Datastore({ filename: './data/database/user.db', autoload: true });
                 info.user.access_token = info.access_token;
+                .
                 info.user.refresh_token = info.refresh_token;
                 db.find({"id":info.uid},function (err,docs) {
                     if(docs.length > 0){
@@ -40,7 +41,8 @@ module.exports = app => {
                         });
                     }
                 });
-                this.ctx.body = info;
+                // this.ctx.body = info;
+                this.ctx.redirect("/");
             }else{
                 yield this.ctx.render('home/login.tpl',{"toast":"用户名和密码错误，请输入雪球用户名和密码！"});
                 // this.error("用户名和密码错误，请输入雪球用户名和密码！")
