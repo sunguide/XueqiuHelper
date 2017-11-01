@@ -1,41 +1,8 @@
 'use strict';
 const moment = require("moment");
 module.exports = app => {
-    class apiController extends app.Controller {
-        * index() {
-            this.ctx.body = "hddd";
-        }
-
-        * messages(req, res) {
-            const _ = require("lodash");
-            let receivers = this.ctx.request.body.receiver;
-            let message = _.trim(this.ctx.request.body.message);
-            let fromId = this.ctx.session.uid;
-            let userInfo, toId;
-            if (receivers && message) {
-                receivers = receivers.split(",");
-                if (receivers) {
-
-                    for (let i = 0; i < receivers.length; i++) {
-                        if (isNaN(receivers[i])) {
-                            userInfo = yield this.ctx.service.xueqiu.getUserInfoByNickname(receivers[i]);
-                            if (userInfo) {
-                                toId = userInfo['id'];
-                            } else {
-                                console.log("user:" + receivers[i] + " not exist")
-                                continue;
-                            }
-                        } else {
-                            toId = receivers[i];
-                        }
-                        yield this.ctx.service.xueqiu.chat(fromId, toId, message, "xq_a_token=" + this.ctx.session.xq_a_token);
-                    }
-                }
-            }
-            this.success({},"已经加入到发送队列中");
-        }
-
-        * test(ctx) {
+    class bonusController extends app.Controller {
+        * index(ctx) {
             const request = require("superagent");
             let url = 'http://api.xueqiu.com/statuses/bonus/list.json?max_id=-1&since_id=-1&size=20&user_id=3595607502&_=1509457988187&_s=b268f6&_t=DD0BD5D4-128D-41FF-973B-3EFE5FF93C5F.3595607502.1509457782293.1509457988188';
              // request.get(url)
@@ -46,8 +13,9 @@ module.exports = app => {
             //获取红包列表
             let bonus = yield ctx.service.xueqiu.request(url,"xq_a_token=3b9b37c0bf75ecbee179b5b72bd3b688b18deffb;u=3595607502");
             bonus = JSON.parse(bonus);
-            let htmls = [];
+            let bonuses = [];
             // ctx.body = bonus;return;
+            let notify = ""
             if(bonus && bonus.items.length > 0){
                 for(let i = 0; i < bonus.items.length; i++){
                     let id = bonus.items[i]['id'];
@@ -57,14 +25,19 @@ module.exports = app => {
                     let title = bonus.items[i]['description'];
                     let target = "http://xueqiu.com" + bonus.items[i].target;
                     if(bonus_info && bonus_info.bonus.state == "DONE"){
-                      htmls.push("<a href='"+target+"'>Done:"+title+"</a>")
+                      bonuses.push({
+                        url:target,title:"Done:"+title,done:true
+                      })
                     }else{
-                      htmls.push("<a href='"+target+"'>赶紧抢："+title+"</a>")
+                      bonuses.push({
+                        url:target,title:"赶紧抢：:"+title,done:false
+                      });
+                      notify = "有新红包："
                     }
-                    if(i>3){break;}
+                    if(i>1){break;}
                 }
             }
-            ctx.body = "<p>红包在线</p>"+htmls.join("<br>");
+            yield this.ctx.render('bonus/index.tpl',{"bonus":bonuses,notify:notify});
             //获取红包状态
             // ctx.body = yield ctx.service.xueqiu.request("https://xueqiu.com/statuses/bonus/state.json?status_id=94711537","xq_a_token=3b9b37c0bf75ecbee179b5b72bd3b688b18deffb;u=3595607502");
             // let departments = this.ctx.service.longhubang.getDepartments();
@@ -92,5 +65,5 @@ module.exports = app => {
         }
 
     }
-    return apiController;
+    return bonusController;
 };
