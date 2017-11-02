@@ -19,7 +19,11 @@
       {% endfor %}
   </div>
 <script>
-  let timestamp = 10000;
+    {% if notify %}
+    let timestamp = 10000;
+    {% else %}
+    let timestamp = 1000;
+    {% endif %}
   setInterval(function(){
      window.location.reload();
   },timestamp);

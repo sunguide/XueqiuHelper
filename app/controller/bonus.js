@@ -4,7 +4,8 @@ module.exports = app => {
     class bonusController extends app.Controller {
         * index(ctx) {
             const request = require("superagent");
-            let url = 'http://api.xueqiu.com/statuses/bonus/list.json?max_id=-1&since_id=-1&size=20&user_id=3595607502&_=1509457988187&_s=b268f6&_t=DD0BD5D4-128D-41FF-973B-3EFE5FF93C5F.3595607502.1509457782293.1509457988188';
+            const now = Date.now();
+            let url = 'http://api.xueqiu.com/statuses/bonus/list.json?max_id=-1&since_id=-1&size=3&user_id=3595607502&_=' + now + '&_s=b238f6&_t=DD0BD5D4-128D-41FF-973B-3EFE5FF93C5F.3595607502.1509457782293.'+now;
              // request.get(url)
              //    .set("Cookie", "xq_a_token=3b9b37c0bf75ecbee179b5b72bd3b688b18deffb;u=3595607502")
              //    .end((err, res) => {

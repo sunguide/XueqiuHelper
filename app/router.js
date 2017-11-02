@@ -7,6 +7,7 @@ module.exports = app => {
   app.get('/test', 'home.test');
 
   app.get('/api', 'api.index');
+  app.get('/test/test', 'test.index');
   app.get('/api/test', 'api.test');
   app.post('/api/messages', 'api.messages');
   app.get('/login', 'home.login');

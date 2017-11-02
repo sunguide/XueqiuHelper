@@ -226,51 +226,87 @@ module.exports = app => {
                stock_quote = yield this.service.xueqiu.getTodayStockInfo(lhb.stock_code);
                app.cache.set("quote_" + lhb.stock_code, stock_quote, 60000);
             }
-            let departments = this.getDepartments();
+            console.log(stock_quote);
+            let $this = this;
             //分析买入榜
             //模型一，买一主买封涨停
             //模型二，卖一砸盘封跌停
             //模型三，股价走过山车
+            //模型四，
             let buyers = [];
+            let sellers = [];
             let comments = [];
             //amplitude振幅
             if(parseFloat(stock_quote.amplitude) > 12){
                 comments.push("主力推动股价巨幅波动走过山车")
             }
-            console.log(stock_quote);
+            let stockCloseStatus = "";
 
+            if(parseFloat(stock_quote.close) === parseFloat(stock_quote.rise_stop)){
+                stockCloseStatus = "RISE_STOP";
+            }
+
+            if(parseFloat(stock_quote.close) === parseFloat(stock_quote.fall_stop)){
+                stockCloseStatus = "FALL_STOP";
+            }
             if(lhb.buy_details){
                 lhb.buy_details.forEach(function (item,i){
                     let departmentName = item[0].split('[')[0];
-                    let departmentAliasName = departmentName;
-                    if(departments[departmentName]){
-                        departmentAliasName = buyers[i] = departments[departmentName];
-                    }
-                    if(parseFloat(stock_quote.close) === parseFloat(stock_quote.rise_stop)){
+                    let departmentAliasName =  $this.getDepartmentAliasName(departmentName);
+                    buyers[i] = departmentAliasName ? departmentName + "（" + departmentAliasName + "）": departmentAliasName;
+                    if(stockCloseStatus == "RISE_STOP"){
                         if(i === 0){
-                            comments.push(departmentAliasName + "主买封涨停板");
+                            comments.push(buyers[i] + "主买封涨停板");
                         }
                     }
+
+                    if(departmentAliasName && !stockCloseStatus){
+                        if(parseFloat(item[2]) > 0){
+                            if(parseFloat(item[3]) > 0){
+                                comments.push(buyers[i] + "做T加仓");
+                            }
+                        }else if(i < 2){
+                            comments.push(buyers[i] + "强势介入");
+                        }else{
+                            comments.push(buyers[i] + "跟风介入");
+                        }
+                    }
+
                 });
             }
 
             if(lhb.sell_details){
                 lhb.sell_details.forEach(function (item,i){
                     let departmentName = item[0].split('[')[0];
-                    let departmentAliasName = departmentName;
-                    if(departments[departmentName]){
-                        departmentAliasName = buyers[i] = departments[departmentName];
-                    }
-                    if(i === 0){
-                        if(parseFloat(stock_quote.close) === parseFloat(stock_quote.fall_stop)){
-                            comments.push(departmentAliasName + "主卖封跌停板");
+                    let departmentAliasName =  $this.getDepartmentAliasName(departmentName);
+                    sellers[i] = departmentAliasName ? departmentName + "（" + departmentAliasName + "）": departmentAliasName;
+                    if(stockCloseStatus == "FALL_STOP"){
+                        if(i === 0){
+                            comments.push(sellers[i] + "主卖封跌停板");
                         }
                     }
+
+
+                    if(departmentAliasName && !stockCloseStatus){
+                        if(parseFloat(item[1]) > 0){
+                            if(parseFloat(item[3]) < 0){
+                                comments.push(sellers[i] + "做T出货");
+                            }
+                        }else{
+                            comments.push(sellers[i] + "清仓出货");
+                        }
+                    }
+
+
                 });
             }
-
-            console.log(comments);
-            return comments.join(",");
+            let _comments = "";
+            if(comments){
+                for(let i = 0; i < comments.length;i++){
+                    _comments += (i+1) + ". "+comments[i] +"<br>";
+                }
+            }
+            return _comments;
         }
         //是否发布到雪球
         * isPostedXueqiu(identify){
@@ -315,41 +351,51 @@ module.exports = app => {
         }
         getDepartments(){
             return  [
-                {"招商证券深圳蛇口工业七路证券营业部": "知名游资『乔帮主』"},
-                {"中信证券溧阳路证券营业部":"知名游资席位"},
-                {"中信证券上海古北路证券营业部":"知名游资席位"},
-                {"中信证券上海瑞金南路证券营业部":"知名游资席位"},
-                {"中信证券上海淮海中路证券营业部":"知名游资席位"},
-                {"浙商证券绍兴解放北路证券营业部":"宁波敢死队『赵老哥』"},
-                {"中国银河证券绍兴证券营业部":"知名游资『赵老哥』"},
-                {"中国银河证券北京阜成路证券营业部":"知名游资『赵老哥』"},
-                {"华泰证券浙江分公司":"知名游资『赵老哥』"},
-                {"湘财证券上海陆家嘴证券营业部":"知名游资『赵老哥』"},
-                {"华泰证券永嘉阳光大道证券营业部":"知名游资『赵老哥』"},
-                {"光大证券佛山绿景路证券营业部":"知名游资『佛山无影脚』"},
-                {"光大证券佛山季华六路":"知名游资『佛山无影脚』"},
-                {"长江证券佛山普澜二路":"知名游资『佛山无影脚』"},
-                {"湘财证券佛山祖庙路":"知名游资『佛山无影脚』"},
-                {"华泰证券成都南一环路证券营业部":"知名游资『职业炒手』"},
-                {"国泰君安证券成都北一环路证券营业部":"知名游资『职业炒手』"},
-                {"国信证券成都二环路证券营业部":"知名游资『职业炒手』"},
-                {"华鑫证券上海宛平南路证券营业部":"知名游资『炒股养家』"},
-                {"华鑫证券宁波沧海路证券营业部":"知名游资『炒股养家』"},
-                {"华鑫证券上海淞滨路证券营业部":"知名游资『炒股养家』"},
-                {"华鑫证券上海松江证券营业部":"知名游资『炒股养家』"},
-                {"华鑫证券上海茅台路证券营业部":"知名游资『炒股养家』"},
-                {"光大证券宁波解放南路证券营业部":"宁波敢死队"},
-                {"华泰证券厦门厦禾路证券营业部":"著名实力游资"},
-                {"中信建投证券宜昌解放路证券营业部":"知名游资『瑞鹤仙』"},
-                {"中国银河证券宜昌新世纪证券营业部":"知名游资『瑞鹤仙』"},
-                {"新时代证券宜昌东山大道证券营业部":"知名游资『瑞鹤仙』"},
-                {"中信证券杭州延安路证券营业部":"著名牛散章建平席位"},
-                {"财通证券有限责任公司绍兴人民中路证券营业部":"浙江帮绍兴知名游资"},
-                {"华泰证券南京六合彤华街证券营业部":"知名游资『桃仙大神龙飞虎』"},
-                {"光大证券股份有限公司杭州庆春路证券营业部":"知名游资"},
-                {"华泰证券股份有限公司上海武定路证券营业部":"新生代游资"},
-                {"华泰证券股份有限公司北京雍和宫证券营业部":"牛散唐汉若"}
+                {"name":"招商证券深圳蛇口工业七路证券营业部","alias":"知名游资『乔帮主』"},
+                {"name":"中信证券溧阳路证券营业部","alias":"知名游资溧阳路"},
+                {"name":"中信证券上海古北路证券营业部","alias":"知名游资上海古北路"},
+                {"name":"中信证券上海瑞金南路证券营业部","alias":"知名游资席位"},
+                {"name":"中信证券上海淮海中路证券营业部","alias":"知名游资席位"},
+                {"name":"浙商证券绍兴解放北路证券营业部","alias":"宁波敢死队『赵老哥』"},
+                {"name":"中国银河证券绍兴证券营业部","alias":"知名游资『赵老哥』"},
+                {"name":"中国银河证券北京阜成路证券营业部","alias":"知名游资『赵老哥』"},
+                {"name":"华泰证券浙江分公司","alias":"知名游资『赵老哥』"},
+                {"name":"湘财证券上海陆家嘴证券营业部","alias":"知名游资『赵老哥』"},
+                {"name":"华泰证券永嘉阳光大道证券营业部","alias":"知名游资『赵老哥』"},
+                {"name":"光大证券佛山绿景路证券营业部","alias":"知名游资『佛山无影脚』"},
+                {"name":"光大证券佛山季华六路","alias":"知名游资『佛山无影脚』"},
+                {"name":"长江证券佛山普澜二路","alias":"知名游资『佛山无影脚』"},
+                {"name":"湘财证券佛山祖庙路","alias":"知名游资『佛山无影脚』"},
+                {"name":"华泰证券成都南一环路证券营业部","alias":"知名游资『职业炒手』"},
+                {"name":"国泰君安证券成都北一环路证券营业部","alias":"知名游资『职业炒手』"},
+                {"name":"国信证券成都二环路证券营业部","alias":"知名游资『职业炒手』"},
+                {"name":"华鑫证券上海宛平南路证券营业部","alias":"知名游资『炒股养家』"},
+                {"name":"华鑫证券宁波沧海路证券营业部","alias":"知名游资『炒股养家』"},
+                {"name":"华鑫证券上海淞滨路证券营业部","alias":"知名游资『炒股养家』"},
+                {"name":"华鑫证券上海松江证券营业部","alias":"知名游资『炒股养家』"},
+                {"name":"华鑫证券上海茅台路证券营业部","alias":"知名游资『炒股养家』"},
+                {"name":"光大证券宁波解放南路证券营业部","alias":"宁波敢死队"},
+                {"name":"华泰证券厦门厦禾路证券营业部","alias":"著名实力游资"},
+                {"name":"中信建投证券宜昌解放路证券营业部","alias":"知名游资『瑞鹤仙』"},
+                {"name":"中国银河证券宜昌新世纪证券营业部","alias":"知名游资『瑞鹤仙』"},
+                {"name":"新时代证券宜昌东山大道证券营业部","alias":"知名游资『瑞鹤仙』"},
+                {"name":"中信证券杭州延安路证券营业部","alias":"著名牛散章建平席位"},
+                {"name":"财通证券有限责任公司绍兴人民中路证券营业部","alias":"浙江帮绍兴知名游资"},
+                {"name":"华泰证券南京六合彤华街证券营业部","alias":"知名游资『桃仙大神龙飞虎』"},
+                {"name":"光大证券股份有限公司杭州庆春路证券营业部","alias":"知名游资"},
+                {"name":"华泰证券股份有限公司上海武定路证券营业部","alias":"新生代游资"},
+                {"name":"华泰证券股份有限公司北京雍和宫证券营业部","alias":"牛散唐汉若"}
             ];
+        }
+
+        getDepartmentAliasName(departmentName){
+            let departments = this.getDepartments();
+            for(let i=0; i < departments.length;i++){
+                if(departments[i].name === departmentName){
+                    return departments[i].alias;
+                }
+            }
+            return "";
         }
     }
 

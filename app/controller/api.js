@@ -36,35 +36,10 @@ module.exports = app => {
         }
 
         * test(ctx) {
-            const request = require("superagent");
-            let url = 'http://api.xueqiu.com/statuses/bonus/list.json?max_id=-1&since_id=-1&size=20&user_id=3595607502&_=1509457988187&_s=b268f6&_t=DD0BD5D4-128D-41FF-973B-3EFE5FF93C5F.3595607502.1509457782293.1509457988188';
-             // request.get(url)
-             //    .set("Cookie", "xq_a_token=3b9b37c0bf75ecbee179b5b72bd3b688b18deffb;u=3595607502")
-             //    .end((err, res) => {
-             //        console.log(res.text);
-             //    });
-            //获取红包列表
-            let bonus = yield ctx.service.xueqiu.request(url,"xq_a_token=3b9b37c0bf75ecbee179b5b72bd3b688b18deffb;u=3595607502");
-            bonus = JSON.parse(bonus);
-            let htmls = [];
-            // ctx.body = bonus;return;
-            if(bonus && bonus.items.length > 0){
-                for(let i = 0; i < bonus.items.length; i++){
-                    let id = bonus.items[i]['id'];
-                    let bonus_info = yield ctx.service.xueqiu.request("https://xueqiu.com/statuses/bonus/state.json?status_id="+id,"xq_a_token=3b9b37c0bf75ecbee179b5b72bd3b688b18deffb;u=3595607502");
-                    console.log(bonus_info);
-                    bonus_info = JSON.parse(bonus_info);
-                    let title = bonus.items[i]['description'];
-                    let target = "http://xueqiu.com" + bonus.items[i].target;
-                    if(bonus_info && bonus_info.bonus.state == "DONE"){
-                      htmls.push("<a href='"+target+"'>Done:"+title+"</a>")
-                    }else{
-                      htmls.push("<a href='"+target+"'>赶紧抢："+title+"</a>")
-                    }
-                    if(i>3){break;}
-                }
-            }
-            ctx.body = "<p>红包在线</p>"+htmls.join("<br>");
+
+
+
+
             //获取红包状态
             // ctx.body = yield ctx.service.xueqiu.request("https://xueqiu.com/statuses/bonus/state.json?status_id=94711537","xq_a_token=3b9b37c0bf75ecbee179b5b72bd3b688b18deffb;u=3595607502");
             // let departments = this.ctx.service.longhubang.getDepartments();
