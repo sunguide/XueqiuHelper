@@ -253,7 +253,7 @@ module.exports = app => {
                 lhb.buy_details.forEach(function (item,i){
                     let departmentName = item[0].split('[')[0];
                     let departmentAliasName =  $this.getDepartmentAliasName(departmentName);
-                    buyers[i] = departmentAliasName ? departmentName + "（" + departmentAliasName + "）": departmentAliasName;
+                    buyers[i] = departmentAliasName ? departmentName + "（" + departmentAliasName + "）": departmentName;
                     if(stockCloseStatus == "RISE_STOP"){
                         if(i === 0){
                             comments.push(buyers[i] + "主买封涨停板");
@@ -279,7 +279,7 @@ module.exports = app => {
                 lhb.sell_details.forEach(function (item,i){
                     let departmentName = item[0].split('[')[0];
                     let departmentAliasName =  $this.getDepartmentAliasName(departmentName);
-                    sellers[i] = departmentAliasName ? departmentName + "（" + departmentAliasName + "）": departmentAliasName;
+                    sellers[i] = departmentAliasName ? departmentName + "（" + departmentAliasName + "）": departmentName;
                     if(stockCloseStatus == "FALL_STOP"){
                         if(i === 0){
                             comments.push(sellers[i] + "主卖封跌停板");
