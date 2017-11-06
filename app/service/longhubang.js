@@ -300,6 +300,21 @@ module.exports = app => {
 
                 });
             }
+            //涨停板出货
+            if(stockCloseStatus == "RISE_STOP"){
+                if(lhb.sell_details && lhb.sell_details.length > 1){
+                    if(parseFloat(lhb.buy_details[0][1]) > 2000 && parseFloat(lhb.sell_details[0][2]) > parseFloat(lhb.buy_details[0][1])){
+                        comments.push(sellers[i] + "涨停板上大肆出货");
+                    }
+                }
+            }else if(stockCloseStatus == "FALL_STOP"){
+            //跌停板上勇于抄底
+                if(lhb.sell_details && lhb.sell_details.length > 1){
+                    if(parseFloat(lhb.buy_details[0][1]) > 2000 && parseFloat(lhb.sell_details[0][2]) < parseFloat(lhb.buy_details[0][1])){
+                        comments.push(sellers[i] + "跌停板上勇于抄底");
+                    }
+                }
+            }
             let _comments = "";
             if(comments){
                 for(let i = 0; i < comments.length;i++){
@@ -356,7 +371,7 @@ module.exports = app => {
                 {"name":"中信证券上海古北路证券营业部","alias":"知名游资上海古北路"},
                 {"name":"中信证券上海瑞金南路证券营业部","alias":"知名游资席位"},
                 {"name":"中信证券上海淮海中路证券营业部","alias":"知名游资席位"},
-                {"name":"浙商证券绍兴解放北路证券营业部","alias":"宁波敢死队『赵老哥』"},
+                {"name":"浙商证券股份有限公司绍兴解放北路证券营业部","alias":"宁波敢死队『赵老哥』"},
                 {"name":"中国银河证券绍兴证券营业部","alias":"知名游资『赵老哥』"},
                 {"name":"中国银河证券北京阜成路证券营业部","alias":"知名游资『赵老哥』"},
                 {"name":"华泰证券浙江分公司","alias":"知名游资『赵老哥』"},
