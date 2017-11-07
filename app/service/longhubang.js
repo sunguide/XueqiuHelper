@@ -304,9 +304,23 @@ module.exports = app => {
             if(stockCloseStatus == "RISE_STOP"){
                 if(lhb.sell_details && lhb.sell_details.length > 1){
                     if(parseFloat(lhb.buy_details[0][1]) > 2000 && parseFloat(lhb.sell_details[0][2]) > parseFloat(lhb.buy_details[0][1])){
-                        comments.push(sellers[i] + "涨停板上大肆出货");
+                        comments.push(sellers[0] + "涨停板上大肆出货");
                     }
                 }
+                if(stock_quote){
+                    if(stock_quote.low == stock_quote.high){
+                        if(parseFloat(stock_quote.turnover_rate) < 2){
+                            comments.push("强势一字涨停板，没啥可说的，明天继续");
+                        }else if(parseFloat(stock_quote.turnover_rate) > 10){
+                            comments.push("一字板涨停，但是换手率有点高，注意高抛低吸");
+                        }else{
+                            comments.push( "一字涨停板，后市可期");
+                        }
+                    }else if(stock_quote.high == stock_quote.open && stock_quote.low < stock_quote.high){
+                        comments.push("一字涨停板被打开，多空激战，注意高抛低吸，守住盈利");
+                    }
+                }
+
             }else if(stockCloseStatus == "FALL_STOP"){
             //跌停板上勇于抄底
                 if(lhb.sell_details && lhb.sell_details.length > 1){
