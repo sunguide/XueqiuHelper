@@ -14,6 +14,8 @@ module.exports = app => {
   app.post('/login', 'home.loginDo');
   app.get('/logout', 'home.logout');
   app.get('/bonus', 'bonus.index');
+  app.get('/v2/api/register','api.user.register');
+  app.get('/v2/api/login','api.user.login');
   // app.get('/api/idCard', 'api.idCard');
   // app.get('/api/ip', 'api.ip');
   // app.get('/api/tinyurl', 'api.tinyURL');
