@@ -9,7 +9,7 @@ module.exports = {
   // task 是真正定时任务执行时被运行的函数，第一个参数是一个匿名的 Context 实例
   * task(ctx) {
       let date = ctx.helper.datetime("YYYYMMDD");;
-      let lastCube = ctx.model.XueqiuCube.find({date:date}).sort({'id':-1}).limit(1);
+      let lastCube = yield ctx.model.XueqiuCube.find({date:date}).sort({'id':-1}).limit(1);
       let i = "1000000";
       if(lastCube.length > 0){
         i = parseFloat(lastCube[0].id);
