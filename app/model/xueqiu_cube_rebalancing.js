@@ -7,5 +7,5 @@ module.exports = app => {
         date: {type: String},
     },{timestamps: true});
 
-    return mongoose.model('cubes', schema);
+    return mongoose.model('cube_rebalancing_log', schema);
 }

@@ -3,7 +3,57 @@ const moment = require("moment");
 module.exports = app => {
     class bonusController extends app.Controller {
         * index(ctx) {
+                let id = "SP1000000";
+                let sp = yield ctx.service.xueqiu.request("https://xueqiu.com/P/"+id,"xq_a_token=daa48a9571b60c8424445ad402cc5f68ef63a371");
+                const cheerio = require("cheerio")
+                let $ = cheerio.load(sp,{decodeEntities: false});
+                let name = $(".cube-title .name").html();
+                if(!name){
+                    console.log("404");
+                }
+                let nav = parseFloat($(".cube-blockmain .cube-profit-day .per").last().html());
+                let username = $(".cube-creator-info .name").html();
+                let uidElement = $(".cube-creator-info a").first();
+                let uid = 0;
+                if(uidElement){
+                    uid = uidElement.attr("href");
+                    if(uid){
+                        uid = parseFloat(uid.replace("/",""));
+                    }
+                }
+                let close = $(".cube-closed").length;
+                let weights = [];
+                $('.weight-list .stock').each(function (i,item) {
+                    let stock_name = $(item).find(".stock-name .name").html();
+                    let stock_code = $(item).find(".stock-name .price").html();
+                    let stock_weight = parseFloat($(item).find(".stock-weight").html());
+                    weights.push({stock_name,stock_code,stock_weight});
+                });
+                let date = this.ctx.helper.datetime("YYYYMMDD");
+                let data = {id,nav,name,weights,uid,username,date,close};
+                let Cube = new this.ctx.model.XueqiuCube(data);
+                let exits = yield this.ctx.model.XueqiuCube.find({"id":id,"date":date});
+                if(exits.length === 0){
+                     Cube.save();
+                }
 
+
+
+
+            this.ctx.body = data;
+
+
+
+
+
+
+
+
+
+
+
+
+            return;
             let lhb = {
                 stock_code: '603963',
                 stock_name: '大理药业',
