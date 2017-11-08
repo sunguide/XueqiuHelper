@@ -21,7 +21,7 @@ module.exports = appInfo => {
     config.env = "local";
     
     config.mongoose = {
-        url: 'mongodb://sunguide.cn/xueqiu_helper',
+        url: 'mongodb://10.0.30.61/xueqiu_helper',
         options: {}
     };
     return config;

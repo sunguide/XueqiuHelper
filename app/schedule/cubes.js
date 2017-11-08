@@ -28,7 +28,7 @@ module.exports = {
           let $ = cheerio.load(sp,{decodeEntities: false});
           let name = $(".cube-title .name").html();
           if(!name){
-              console.log("404");
+              console.log(id+"[404]");
               continue;
           }
           let nav = parseFloat($(".cube-blockmain .cube-profit-day .per").last().html());
