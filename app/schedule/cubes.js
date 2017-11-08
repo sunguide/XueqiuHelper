@@ -12,7 +12,7 @@ module.exports = {
       let lastCube = yield ctx.model.XueqiuCube.find({date:date}).sort({'id':-1}).limit(1);
       let i = "1000000";
       if(lastCube.length > 0){
-        i = parseFloat(lastCube[0].id);
+        i = parseFloat(lastCube[0].id.replace("SP",""));
       }
       console.log(i);
       for(i; i< 1100000; i++){
