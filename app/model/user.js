@@ -5,7 +5,7 @@ module.exports = app => {
         username: {type: String},
         password: {type: String},
         nickname: {type: String},
-    });
+    },{timestamps: true});
 
     return mongoose.model('user', schema);
 }

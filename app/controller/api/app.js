@@ -4,19 +4,16 @@ module.exports = app => {
     class userApiController extends app.Controller {
         * register(req, res) {
             const _ = require("lodash");
-            let username = _.trim(this.ctx.request.body.username || this.ctx.request.query.username);
-            let nickname = _.trim(this.ctx.request.body.nickname || this.ctx.request.query.nickname);
-            let password = _.trim(this.ctx.request.body.password || this.ctx.request.query.password);
-            let verify_code = _.trim(this.ctx.request.body.verify_code || this.ctx.request.query.verify_code);
+            let app_name = _.trim(this.ctx.request.body.app_name || this.ctx.request.query.app_name);
+            let app_repos = _.trim(this.ctx.request.body.app_repos || this.ctx.request.query.app_repos);
             let result = false;
-            let data = {username,nickname,password}
-            if (username && password) {
-                let exist = yield this.ctx.model.User.find({username:username});
-                console.log(exist);
+            let data = {name:app_name,repos:app_repos}
+            if (app_name && app_repos) {
+                let exist = yield this.ctx.model.App.find({name:app_name});
                 if(exist.length > 0){
-                    this.error("用户已经存在")
+                    this.error("应用已经存在")
                 }else{
-                    let model = new this.ctx.model.User(data);
+                    let model = new this.ctx.model.App(data);
                     result = yield model.save();
                     if(result){
                         this.success(data,"注册成功")
@@ -27,7 +24,7 @@ module.exports = app => {
             }
         }
 
-        * login(req, res) {
+        * update(req, res) {
             const _ = require("lodash");
             let username = _.trim(this.ctx.request.body.username || this.ctx.request.query.username);
             let password = _.trim(this.ctx.request.body.password || this.ctx.request.query.password);

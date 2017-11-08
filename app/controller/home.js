@@ -8,8 +8,9 @@ module.exports = app => {
             yield this.ctx.render('home/index.tpl', data);
         }
         * test(){
-          let info = yield this.ctx.service.xueqiu.getFollows(3)
-          this.ctx.body = info;
+          // let info = yield this.ctx.service.xueqiu.getFollows(3)
+          // this.ctx.body = info;
+            yield this.ctx.service.xueqiu.request('')
         }
 
         * login(){

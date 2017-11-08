@@ -16,6 +16,9 @@ module.exports = app => {
   app.get('/bonus', 'bonus.index');
   app.get('/v2/api/register','api.user.register');
   app.get('/v2/api/login','api.user.login');
+  app.get('/v2/api/app/register','api.app.register');
+  app.get('/v2/api/app/update','api.app.update');
+
   // app.get('/api/idCard', 'api.idCard');
   // app.get('/api/ip', 'api.ip');
   // app.get('/api/tinyurl', 'api.tinyURL');
