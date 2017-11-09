@@ -439,3 +439,7 @@ label{
 .toast-dialog .close{
     font-weight: 100;
 }
+
+.cubes-container{
+    padding: 50px;
+}
