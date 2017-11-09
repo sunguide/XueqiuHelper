@@ -201,7 +201,12 @@ module.exports = app => {
                 request.get(url)
                     .set("Cookie", cookie)
                     .end((err, res) => {
-                        resolve(res.text);
+                        if(err){
+                          console.log(err);
+                          resolve("");
+                        }else{
+                          resolve(res.text);
+                        }
                     });
             });
         }

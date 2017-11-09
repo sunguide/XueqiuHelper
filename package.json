@@ -11,6 +11,7 @@
     "egg-bin": "^4.3.5",
     "egg-mock": "^3.13.1",
     "egg-mongoose": "^2.1.1",
+    "egg-redis": "^1.0.2",
     "egg-scripts": "^2.1.0",
     "egg-view-nunjucks": "^2.1.4",
     "gm": "^1.23.0",

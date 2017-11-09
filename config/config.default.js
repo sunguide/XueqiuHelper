@@ -24,6 +24,14 @@ module.exports = appInfo => {
         url: 'mongodb://10.0.30.61/xueqiu_helper',
         options: {}
     };
+    config.redis = {
+        client: {
+            port: 6379,          // Redis port
+            host: '10.0.30.61',   // Redis host
+            password: '',
+            db: 10,
+        },
+    }
     return config;
 };
 
