@@ -32,22 +32,6 @@ module.exports = app => {
             };
         }
 
-        /**
-         * request hacker-news api
-         * @param {String} api - Api name
-         * @param {Object} [opts] - urllib options
-         * @return {Promise} response.data
-         */
-        * request(api, opts) {
-            const options = Object.assign({
-                dataType: 'json',
-                timeout: ['30s', '30s'],
-            }, opts);
-
-            const result = yield this.ctx.curl(`https://xueqiu.com/S/${api}`, options);
-            return result.data.toString();
-        }
-
         * getRecentPoster(stock_code){
             const _ = require('lodash');
 

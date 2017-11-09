@@ -14,6 +14,7 @@ module.exports = app => {
   app.post('/login', 'home.loginDo');
   app.get('/logout', 'home.logout');
   app.get('/bonus', 'bonus.index');
+  app.get('/schedule', 'schedule.index');
   app.get('/v2/api/register','api.user.register');
   app.get('/v2/api/login','api.user.login');
   app.get('/v2/api/app/register','api.app.register');
