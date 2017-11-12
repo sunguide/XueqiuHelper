@@ -35,6 +35,10 @@ module.exports = app => {
             this.success({},"已经加入到发送队列中");
         }
 
+        * cubes(){
+            let ids = yield this.ctx.app.redis.llen("cube_ids");
+            this.success({length:ids});
+        }
         * test(ctx) {
 
 
