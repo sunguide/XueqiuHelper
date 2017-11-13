@@ -12,7 +12,7 @@ module.exports = {
     let cubes = yield ctx.model.XueqiuCube.find({date:date,close:0},{id:1}).find();
     for(let i = 0; i< cubes.length; i++){
         console.log(cubes[i].id);
-        ctx.app.redis.lpush("cube_ids",cubes[i].id);
+        ctx.app.redis.rpush("cube_ids",cubes[i].id);
     }
     console.log("schedule queue finish");
 
