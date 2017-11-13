@@ -12,9 +12,20 @@ module.exports = {
         console.log("cube client start");
         let start = Date.now();
         let id = false;
+        let count = yield ctx.app.redis.llen("cube_ids");
+        let cookie = "";
+        if(count){
+            cookie = yield ctx.service.xueqiu.getLoginCookie({
+                username: "18521527527",
+                password: "woshini8",
+            });
+        }else{
+            console.log("no cube job");
+            return;
+        }
         while (id = yield ctx.app.redis.lpop("cube_ids")) {
             console.log(id);
-            yield ctx.service.cube.fetchOne(id, "xq_a_token=daa48a9571b60c8424445ad402cc5f68ef63a371");
+            yield ctx.service.cube.fetchOne(id, cookie);
         }
         let costTime = parseFloat(Date.now() - start);
         console.log("cost time: "+ costTime/1000 + "s");
