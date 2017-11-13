@@ -5,7 +5,7 @@ module.exports = {
     schedule: {
         interval: '1m', // 1 分钟间隔
         type: 'all', // 指定所有的 worker 都需要执行
-        // disable: true
+        disable: true
     },
     // task 是真正定时任务执行时被运行的函数，第一个参数是一个匿名的 Context 实例
     * task(ctx) {
