@@ -25,6 +25,13 @@ module.exports = app => {
             }
         }
 
+        * checkFails(id){
+            return yield app.redis.get(id);
+        }
+        * setFails(id){
+            return yield app.redis.incr(id);
+        }
+
 
     }
 

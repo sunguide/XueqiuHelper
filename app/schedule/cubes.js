@@ -19,17 +19,25 @@ module.exports = {
                 username: "18521527527",
                 password: "woshini8",
             });
+            console.log(cookie);
         }else{
             console.log("no cube job");
             return;
         }
         while (id = yield ctx.app.redis.lpop("cube_ids")) {
-            ctx.app.redis.zadd("cube_ids_fails",Date.now(),id);
+            ctx.app.redis.zadd("cube_ids_fails",Date.now()+30000,id);//30s延迟
             let result = yield ctx.service.cube.fetchOne(id, cookie);
             if(result){
-                ctx.app.redis.zrem("cube_ids_fails",id);
+                yield ctx.app.redis.zrem("cube_ids_fails",id);
             }else{
-                console.log("fetch fail:"+id);
+                let fails = yield app.redis.get(id);
+                if(fails > 3){
+                    yield ctx.app.redis.zrem("cube_ids_fails",id);
+                    console.log("fetch fail: "+id);
+                }else{
+                    yield ctx.app.redis.incr(id);
+                    console.log("5 times fails: " +id)
+                }
             }
         }
         let costTime = parseFloat(Date.now() - start);

@@ -42,8 +42,12 @@ module.exports = app => {
         * test(ctx) {
 
 
-
-
+            let cookie1 = yield this.ctx.service.xueqiu.getLoginCookie({
+                username:"18521527527",
+                password:"woshini8"
+            });
+            let cookie2 = yield this.ctx.service.xueqiu.getLoginCookie();
+            this.ctx.body =  cookie1+"<br>"+cookie2
             //获取红包状态
             // ctx.body = yield ctx.service.xueqiu.request("https://xueqiu.com/statuses/bonus/state.json?status_id=94711537","xq_a_token=3b9b37c0bf75ecbee179b5b72bd3b688b18deffb;u=3595607502");
             // let departments = this.ctx.service.longhubang.getDepartments();

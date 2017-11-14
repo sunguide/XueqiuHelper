@@ -11,13 +11,16 @@ module.exports = {
     * task(ctx) {
         console.log("job restart");
         let start = Date.now();
-        let ids = yield ctx.app.redis.zrevrange("cube_ids_fails",0,-1);
+        let ids = yield ctx.app.redis.zrangebyscore("cube_ids_fails",0,Date.now());
 
         if(ids && ids.length > 0){
             for(let i =0; i< ids.length;i++){
                 yield ctx.app.redis.rpush("cube_ids",ids[i]);
                 yield ctx.app.redis.zrem("cube_ids_fails",ids[i]);
             }
+        }else{
+            console.log("no jobs");
+            return;
         }
 
         let costTime = parseFloat(Date.now() - start);
