@@ -38,13 +38,15 @@ module.exports = app => {
                     }
                     let close = $(".cube-closed").length;
                     let weights = [];
+                    let positions = 0;
                     $('.weight-list .stock').each(function (i, item) {
                         let stock_name = $(item).find(".stock-name .name").html();
                         let stock_code = $(item).find(".stock-name .price").html();
                         let stock_weight = parseFloat($(item).find(".stock-weight").html());
                         weights.push({stock_name, stock_code, stock_weight});
+                        positions += stock_weight;
                     });
-                    let data = {id, nav, name, weights, uid, username, date, close};
+                    let data = {id, nav, name, weights, uid, username, date, close,positions};
                     if(!data.uid){
                         resolve(false);
                         return;
