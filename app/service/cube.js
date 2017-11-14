@@ -12,11 +12,10 @@ module.exports = app => {
             let ctx = this.ctx;
             let date = ctx.helper.datetime("YYYYMMDD");
 
-            console.log("fetchOne");
             return new Promise((resolve, reject) => {
                 co(ctx.service.xueqiu.request("https://xueqiu.com/P/" + id, cookie)).then(function (sp) {
                     if (!sp) {
-                        console.log("Fetch error");
+                        console.log("Fetch error:"+id);
                         resolve(false);
                         return;
                     }
@@ -55,11 +54,19 @@ module.exports = app => {
                             let Cube = new ctx.model.XueqiuCube(data);
                             Cube.save(function (err, docs) {
                                 console.log("save success" + docs)
-                                resolve(true);
+                                if(err){
+                                    resolve(false);
+                                }else{
+                                    resolve(true);
+                                }
                             });
                         } else {
-                            ctx.model.XueqiuCube.update({id: id, date: date}, data, {multi: true}, function () {
-                                resolve(true);
+                            ctx.model.XueqiuCube.update({id: id, date: date}, data, {multi: true}, function (err) {
+                                if(err){
+                                    resolve(false);
+                                }else{
+                                    resolve(true);
+                                }
                             });
                         }
                     });

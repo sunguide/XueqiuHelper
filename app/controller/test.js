@@ -3,8 +3,8 @@ const moment = require("moment");
 module.exports = app => {
     class bonusController extends app.Controller {
         * index(ctx) {
-                let id = "SP1000000";
-                let sp = yield ctx.service.xueqiu.request("https://xueqiu.com/P/"+id,"xq_a_token=daa48a9571b60c8424445ad402cc5f68ef63a371");
+                let id = "SP1030021";
+                let sp = yield ctx.service.xueqiu.request("https://xueqiu.com/P/"+id,"xq_a_token=cf1f18c3f246ae2102d2b48e30d6dcd48836a7e8");
                 const cheerio = require("cheerio")
                 let $ = cheerio.load(sp,{decodeEntities: false});
                 let name = $(".cube-title .name").html();
@@ -29,12 +29,15 @@ module.exports = app => {
                     let stock_weight = parseFloat($(item).find(".stock-weight").html());
                     weights.push({stock_name,stock_code,stock_weight});
                 });
+
                 let date = this.ctx.helper.datetime("YYYYMMDD");
-                let data = {id,nav,name,weights,uid,username,date,close};
-                let Cube = new this.ctx.model.XueqiuCube(data);
+                let data = {id,nav,name,weights:weights,uid,username,date,close};
                 let exits = yield this.ctx.model.XueqiuCube.find({"id":id,"date":date});
                 if(exits.length === 0){
-                     Cube.save();
+                    let Cube = new this.ctx.model.XueqiuCube(data);
+                    Cube.save();
+                }else{
+                    yield this.ctx.model.XueqiuCube.update({"id":id,"date":date},data);
                 }
 
 
