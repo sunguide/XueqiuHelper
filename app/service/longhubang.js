@@ -325,7 +325,7 @@ module.exports = app => {
             //跌停板上勇于抄底
                 if(lhb.sell_details && lhb.sell_details.length > 1){
                     if(parseFloat(lhb.buy_details[0][1]) > 2000 && parseFloat(lhb.sell_details[0][2]) < parseFloat(lhb.buy_details[0][1])){
-                        comments.push(buyers[i] + "跌停板上勇于抄底");
+                        comments.push(buyers[0][1] + "跌停板上勇于抄底");
                     }
                 }
             }
