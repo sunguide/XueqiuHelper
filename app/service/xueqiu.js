@@ -292,10 +292,6 @@ module.exports = app => {
           });
         }
         * getLoginCookie(options) {
-            if (this.cookie) {
-                console.log("login cookie from this")
-                return this.cookie;
-            }
             let urls = this.urls;
             let loginPass = {
                 remember_me: true,
@@ -307,8 +303,12 @@ module.exports = app => {
               loginPass.username = options.username;
               loginPass.password = options.password;
             }
+            let cookie = yield app.redis.get(loginPass.username);
+            if(cookie){
+                return cookie;
+            }
             let base_headers = this.base_headers;
-            return this.cookie = yield function () {
+            cookie = yield function () {
                 return new Promise(function (resolve, reject) {
                     request.get(urls.home)
                         .end((err, res) => {
@@ -339,6 +339,9 @@ module.exports = app => {
                         });
                 });
             }();
+
+            yield app.redis.set(loginPass.username,cookie,'EX', 3600);
+            return cookie;
         }
         * getLogin(username,password) {
             let urls = this.urls;
