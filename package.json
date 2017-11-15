@@ -29,7 +29,7 @@
     "grunt-contrib-jshint": "^1.1.0"
   },
   "scripts": {
-    "start": "egg-scripts start --daemon",
+    "start": "egg-scripts start --daemon --env=prod",
     "stop": "egg-scripts stop",
     "dev": "egg-bin dev && open http://localhost:7001/",
     "test": "egg-bin test"

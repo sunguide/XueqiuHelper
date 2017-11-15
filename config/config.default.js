@@ -21,7 +21,7 @@ module.exports = appInfo => {
     config.env = "local";
 
     config.mongoose = {
-        url: 'mongodb://10.0.30.61/xueqiu_helper',
+        url: 'mongodb://10.0.30.61/xueqiu_helper_dev',
         options: {}
     };
     config.redis = {
@@ -29,7 +29,7 @@ module.exports = appInfo => {
             port: 6379,          // Redis port
             host: '10.0.30.61',   // Redis host
             password: 'fuckyou',
-            db: 10,
+            db: 1,
         },
     }
     return config;
