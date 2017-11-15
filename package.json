@@ -32,6 +32,7 @@
     "start": "egg-scripts start --daemon --env=prod",
     "stop": "egg-scripts stop",
     "dev": "egg-bin dev && open http://localhost:7001/",
+    "prod": "egg-bin prod && open http://localhost:7001/",
     "test": "egg-bin test"
   }
 }

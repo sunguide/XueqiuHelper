@@ -30,7 +30,7 @@ module.exports = {
             if(result){
                 yield ctx.app.redis.zrem("cube_ids_fails",id);
             }else{
-                let fails = yield app.redis.get(id);
+                let fails = yield ctx.app.redis.get(id);
                 if(fails > 3){
                     yield ctx.app.redis.zrem("cube_ids_fails",id);
                     console.log("fetch fail: "+id);
