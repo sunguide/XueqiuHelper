@@ -8,6 +8,25 @@ module.exports = app => {
             let cubes_statistics = yield ctx.model.XueqiuCube.aggregate([
             {
              $match: {
+               "close": 0,
+               "nav":{$gt:0}
+             }
+            },
+            {
+              $group: {
+                 _id:"$date", //将_id设置为day数据
+                 total:{$sum: 1}, //统计price
+                 totalPositions:{$sum: "$positions"} //统计price
+              }
+            },
+            {
+              $sort: {_id: 1}//根据date排序
+            }
+            ]);
+            this.ctx.body = cubes_statistics;return;
+            let cubesPositionsStatistics = yield ctx.model.XueqiuCube.aggregate([
+            {
+             $match: {
                "close": 0
              }
             },
@@ -40,7 +59,6 @@ module.exports = app => {
                                 cube_weights[item.stock_code] = item;
                             }
                         }
-
                     }
                 }
             }
