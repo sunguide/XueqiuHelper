@@ -10,40 +10,32 @@ module.exports = {
   // task 是真正定时任务执行时被运行的函数，第一个参数是一个匿名的 Context 实例
   * task(ctx) {
     let date = "20171109";//ctx.helper.datetime("YYYYMMDD");;
-    let cubes = yield ctx.model.XueqiuCube.find({date:date,close:0},{id:1}).find();
+
+    let dates = yield ctx.model.XueqiuCube.aggregate([{
+        $match:{
+            close: 0
+        }
+    },{
+        $group:{
+            _id: '$date'
+        }
+    }]).sort({_id:-1});
+    if(dates.length > 0){
+       date = dates[1]._id;
+    }
+
+    let cubes = yield ctx.model.XueqiuCube.find({date:date,close:0},{id:1}).find().sort({id:-1});
+    if(cubes.length > 0){
+       let lastNumber  = cubes[0].id.replace("SP","");
+       for(let i = 1; i < 100; i++){
+           cubes.push({id:"SP"+(parseInt(lastNumber) + i)});
+       }
+    }
     for(let i = 0; i< cubes.length; i++){
         console.log(cubes[i].id);
-        ctx.app.redis.rpush("cube_ids",cubes[i].id);
+        yield ctx.app.redis.rpush("cube_ids",cubes[i].id);
     }
     console.log("schedule queue finish");
-
-//2
-//       let i = 1000000;
-//       for(i; i< 1040000; i++){
-//           let id = "SP"+i;
-//           ctx.app.redis.lpush("cube_ids",id);
-//       }
-//       console.log("schedule queue finish");
-
-    // const cheerio = require("cheerio");
-    // const co = require("co");
-    // let date = ctx.helper.datetime("YYYYMMDD");;
-    // let lastCube = yield ctx.model.XueqiuCube.find({date:date}).sort({'id':-1}).limit(1);
-    // let i = 1000000;
-    // if(lastCube.length > 0){
-    //   // i = lastCube[0].id.replace("SP","");
-    // }
-    // let id = "SP"+i;
-    // let cookie = "xq_a_token=daa48a9571b60c8424445ad402cc5f68ef63a371";
-    // for(i; i< 1040000; i++){
-    //     let id = "SP"+i;
-    //     console.log(id);
-    //     let sp = yield ctx.service.xueqiu.request("https://xueqiu.com/P/"+id,cookie);
-    //     if(sp){
-    //       ctx.app.redis.lpush("cube_htmls",sp);
-    //       console.log(id+":queue pushed");
-    //     }
-    // }
   }
 
 };

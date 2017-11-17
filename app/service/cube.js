@@ -108,8 +108,7 @@ module.exports = app => {
                 }
             });
         }
-
     }
 
     return cube;
-};
+}
