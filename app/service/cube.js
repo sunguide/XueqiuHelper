@@ -46,7 +46,7 @@ module.exports = app => {
                         let stock_weight = parseFloat($(item).find(".stock-weight").html());
                         weights.push({stock_name, stock_code, stock_weight});
                         positions += stock_weight;
-                        yield $this.addCubePosition({id, date, stock_name, stock_code, stock_weight});
+                        $this.addCubePosition({id, date, stock_name, stock_code, stock_weight});
                         //cube_postions
 
                     });
@@ -107,7 +107,6 @@ module.exports = app => {
                     });
                 }
             });
-            }
         }
 
     }
