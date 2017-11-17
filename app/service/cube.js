@@ -10,6 +10,7 @@ module.exports = app => {
             const co = require("co");
             const cheerio = require("cheerio");
             let ctx = this.ctx;
+            let $this = this;
             let date = ctx.helper.datetime("YYYYMMDD");
 
             return new Promise((resolve, reject) => {
@@ -45,6 +46,9 @@ module.exports = app => {
                         let stock_weight = parseFloat($(item).find(".stock-weight").html());
                         weights.push({stock_name, stock_code, stock_weight});
                         positions += stock_weight;
+                        yield $this.addCubePosition({id, date, stock_name, stock_code, stock_weight});
+                        //cube_postions
+
                     });
                     let data = {id, nav, name, weights, uid, username, date, close,positions};
                     if(!data.uid){
@@ -76,6 +80,34 @@ module.exports = app => {
                 });
             });
 
+        }
+
+        * addCubePosition(data){
+            let ctx = this.ctx;
+            let conditions = {id: data.id, date: data.date, stock_code:data.stock_code};
+            ctx.model.XueqiuCubePosition.find(conditions, function (err, exist) {
+                if(err){
+                    console.log(err);
+                    return;
+                }
+                if (exist.length === 0) {
+                    let CubePosition = new ctx.model.XueqiuCubePosition(data);
+                    CubePosition.save(function (err, docs) {
+                        if(err){
+                          console.log("save fail");
+                          console.log(data);
+                        }
+                    });
+                } else {
+                    ctx.model.XueqiuCubePosition.update(conditions, data, {multi: false}, function (err) {
+                        if(err){
+                            console.log("update fail");
+                            console.log(data);
+                        }
+                    });
+                }
+            });
+            }
         }
 
     }
