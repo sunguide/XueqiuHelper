@@ -25,7 +25,7 @@ module.exports = {
             return;
         }
         while (id = yield ctx.app.redis.lpop("cube_ids")) {
-            ctx.app.redis.zadd("cube_ids_fails",Date.now()+30000,id);//30s延迟
+            yield ctx.app.redis.zadd("cube_ids_fails",Date.now()+30000,id);//30s延迟
             let result = yield ctx.service.cube.fetchOne(id, cookie);
             if(result){
                 yield ctx.app.redis.zrem("cube_ids_fails",id);
