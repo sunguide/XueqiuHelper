@@ -15,3 +15,7 @@ exports.redis = {
   enable: true,
   package: 'egg-redis',
 };
+exports.kue ={
+  enable: true,
+  package: 'egg-kue',
+};
