@@ -86,6 +86,11 @@ module.exports = app => {
 
         }
 
+        * redisPub(){
+            yield this.app.redis.publish("job","job coming");
+            console.log("job comming");
+        }
+
     }
     return bonusController;
 };

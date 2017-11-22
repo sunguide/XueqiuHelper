@@ -19,10 +19,6 @@ module.exports = app => {
                 success:false,
                 message:msg
             };
-            this.ctx.res.end({
-                success:false,
-                message:msg
-            });
         }
     }
     app.Controller = CustomController;
