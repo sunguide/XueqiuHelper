@@ -1,20 +1,29 @@
 const Subscription = require('egg').Subscription;
 
 class download extends Subscription {
-  async subscribe(ctx) {
-      queue = kue.createQueue();
-      const _ = require("loadash");
-      queue.process('download', function(job, done){
+  static get job(){
+    return {
+      type: 'worker',
+      name: 'download',
+      immediate: false,
+    };
+  }
+  async subscribe() {
+      console.log(this.ctx);
+
+      this.ctx.app.kue.process('task_download', function(job, done){
         startDownload(job, done);
       });
 
       function startDownload(job, done) {
-
-        if(!_.isVaildUrl(job.url)) {
-          return done(new Error('invalid to address'));
+        console.log(job);
+        if(!(job.url)) {
+          return done(new Error('invalid url address'));
         }
-        done();
+
+        done("done success");
       }
+      console.log("ddd");
   }
 }
 

@@ -6,7 +6,7 @@ module.exports = agent => {
     // 但需要等待 App Worker 启动成功后才能发送，不然很可能丢失
     const redis = require("redis");
     agent.sub = redis.createClient('6379', '10.0.30.61',{password:"fuckyou",db:10});
-    agent.pub = redis.createClient('6379', '10.0.30.61',{password:"fuckyou",db:10});
+    agent.redis = redis.createClient('6379', '10.0.30.61',{password:"fuckyou",db:10});
 
     agent.messenger.on('egg-ready', () => {
         const data = {  };
@@ -36,18 +36,19 @@ module.exports = agent => {
     agent.task_sub = redis.createClient('6379', '10.0.30.61',{password:"fuckyou",db:10});
     let taskKey = "task";
     agent.task_sub.subscribe(taskKey);
-    agent.task_sub.on("message",function(channel,job){
-        console.log($this.schedule.sence);
+    agent.task_sub.on("message",function(channel, job){
+        job = JSON.parse(job);
         if(channel == taskKey){
             if(job && job.name){
                let key = taskKey +"_" + job.name;
-               let num = agent.task_sub.decr(taskKey);
+               let num = agent.redis.decr(taskKey+"_"+job.name);
+               console.log("num"+num);
                if(num >= 0){
-                  ctx.
+                 // agent.ctx.runInBackground(function* () {
+                 //
+                 // });
                }
-
             }
-
         }
     });
 

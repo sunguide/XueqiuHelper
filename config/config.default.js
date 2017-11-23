@@ -34,14 +34,14 @@ module.exports = appInfo => {
     };
     config.kue = {
         app : true,
-        agent : false,
+        agent : true,
         client :{
             prefix: 'q',
             redis: {
                 port: 6379,
                 host: '10.0.30.61',
                 auth: 'fuckyou',
-                db: 9, // if provided select a non-default redis db
+                db: 10, // if provided select a non-default redis db
                 options: {
                     // see https://github.com/mranney/node_redis#rediscreateclient
                 }
@@ -51,7 +51,7 @@ module.exports = appInfo => {
 
     config.job = {
         app : true,
-        agent : false,
+        agent : true,
         client :{
             prefix: 'q',
             redis: {

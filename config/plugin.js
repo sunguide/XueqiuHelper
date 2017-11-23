@@ -20,6 +20,6 @@ exports.kue ={
   package: 'egg-kue',
 };
 exports.job = {
-    enable: false,
+    enable: true,
     package: 'egg-job',
 };
