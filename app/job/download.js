@@ -25,6 +25,9 @@ class download extends Subscription {
       }
       console.log("ddd");
   }
+  async done(){
+
+  }
 }
 
 module.exports = download;

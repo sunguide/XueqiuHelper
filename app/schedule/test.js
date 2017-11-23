@@ -7,6 +7,7 @@ class UpdateCache extends Subscription {
     return {
       type: 'cluster', // 指定所有的 worker 都需要执行
       sence: 'job',
+        disable:true,
       immediate: false,
     };
   }

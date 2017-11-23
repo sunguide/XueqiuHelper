@@ -57,7 +57,7 @@ module.exports = appInfo => {
             redis: {
                 port: 6379,
                 host: '10.0.30.61',
-                auth: 'fuckyou',
+                password: 'fuckyou',
                 db: 9, // if provided select a non-default redis db
                 options: {
                     // see https://github.com/mranney/node_redis#rediscreateclient
