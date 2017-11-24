@@ -9,8 +9,7 @@ class download extends Subscription {
     };
   }
   async subscribe() {
-      console.log(this.ctx);
-
+      console.log("zhixing");
       this.ctx.app.kue.process('task_download', function(job, done){
         startDownload(job, done);
       });

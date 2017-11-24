@@ -13,8 +13,20 @@ module.exports = app => {
             }
         }
 
-        * dispatch(ctx){
-            yield this.app.redis.publish("task",JSON.stringify({name:"download"}));
+        async dispatch(ctx){
+            console.log("job start/");
+            console.log(this.app.job);
+            let result = await this.app.job.publish({
+              name:"download",
+              queue:"download_1232434",
+              workers:10,
+              ttl:12123423,
+            });
+            console.log(result);
+            console.log("job end/");
+            await this.app.redis.publish("task",JSON.stringify({name:"download"}));
+
+
             var job = ctx.app.kue.create('task_download', {
                 title: 'welcome email for tj',
                 to: 'tj@learnboost.com',
@@ -24,7 +36,7 @@ module.exports = app => {
                if( !err ) console.log( job.id );
             });
 
-            yield this.app.redis.set("task_download",10);
+            await this.app.redis.set("task_download",10);
             ctx.body = "task comming";
         }
 

@@ -34,7 +34,7 @@ module.exports = app => {
       // 设置 call 在加载时会调用函数返回 UserService
       call: true,
       // 将文件加载到 app.serviceClasses
-      fieldClass: 'job',
+      fieldClass: '_job',
     });
     //启动kue ui
     const kue = require("kue");
