@@ -1,7 +1,7 @@
 'use strict';
 const moment = require("moment");
 module.exports = app => {
-    class userApiController extends app.Controller {
+    class appApiController extends app.Controller {
         * register(req, res) {
             const _ = require("lodash");
             let app_name = _.trim(this.ctx.request.body.app_name || this.ctx.request.query.app_name);
@@ -26,8 +26,8 @@ module.exports = app => {
 
         * update(req, res) {
             const _ = require("lodash");
-            let username = _.trim(this.ctx.request.body.username || this.ctx.request.query.username);
-            let password = _.trim(this.ctx.request.body.password || this.ctx.request.query.password);
+            let app_name = _.trim(this.ctx.request.body.app_name || this.ctx.request.query.app_name);
+            let app_repos = _.trim(this.ctx.request.body.app_repos || this.ctx.request.query.app_repos);
             let verify_code = _.trim(this.ctx.request.body.verify_code || this.ctx.request.query.verify_code);
             let result = false;
             if (username && password) {
@@ -43,5 +43,5 @@ module.exports = app => {
         }
 
     }
-    return userApiController;
+    return appApiController;
 };
