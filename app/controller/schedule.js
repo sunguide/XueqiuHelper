@@ -28,10 +28,10 @@ module.exports = app => {
 
 
             var job = ctx.app.kue.create('task_download', {
-                title: 'welcome email for tj',
-                to: 'tj@learnboost.com',
+                title: 'welcome email for you',
+                to: 'sunguide@qq.cn',
                 template: 'welcome-email',
-                url:"https://www.baiud.com"
+                url:"https://www.sunguide.cn"
             }).save( function(err){
                if( !err ) console.log( job.id );
             });

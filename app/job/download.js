@@ -15,7 +15,6 @@ class download extends Subscription {
       });
 
       function startDownload(job, done) {
-        console.log(job);
         if(!(job.url)) {
           return done(new Error('invalid url address'));
         }
