@@ -1,20 +1,16 @@
-/**
- * Created by sunguide on 16/11/27.
- */
-
+'use strict';
 const fs = require("fs");
 const http = require("http");
 const path = require("path");
 const Promise = require('bluebird');
-const cheerio = require('cheerio');
-const redis = require("redis");
-const xpath = require('xpath'), dom = require('xmldom').DOMParser;
-const Mongo = require('mongodb');
+const crypt = require("crypt");
+
 let Log = require('winston');
 
 let global_config = require('./config').config;
 
-let Downloader = require("./downloader.js");
+const Downloader = require("./downloader");
+const Extractor = require("./extractor");
 
 //job queue
 let kue = require('kue'),
@@ -46,6 +42,7 @@ class crawler {
 
         }
     }
+
     config(config){
         this.config = config;
         if(typeof this.config.interval == 'undefined'){
@@ -56,6 +53,7 @@ class crawler {
             this.config.timeout = timeout;
         }
     }
+
     filter(){
 
     }
@@ -68,13 +66,16 @@ class crawler {
             config.beforeCrawl();
         }
 
+        let pageUrls = await this.getPageUrls();
+
 
     }
-    getPageUrl(){
+    async getPageUrls(){
       let config = this.config;
+      let self = this;
       //根据分页规则抓取
       if(config.pageUrlRules && config.pageUrlRules.length > 0){
-          //new
+          let nextPageUrl = "";
           Promise.map(this.config.pageUrlRules, pageUrlRule => {
               return fs.readFileAsync(fileName).then(JSON.parse).catch(SyntaxError, function(e) {
                   e.fileName = fileName;
@@ -90,33 +91,12 @@ class crawler {
 
               if(config.interval){
                   let crawlInterval = setInterval(function(){
-                      nextPageUrl = getNextPageUrl(pageUrlRule);
-                      generateCrawlUrls(nextPageUrl);
-                      // getCrawlUrls(nextPageUrl)
-                      //     .then(function (urls) {
-                      //         for (i = 0; i < urls.length; i++) {
-                      //             extract(urls[i])
-                      //         }
-                      //     }).catch(function (err) {
-                      //         crawlQuit = true;
-                      //         Log.error(err);
-                      //         Log.info("quit");
-                      //     });
-
-                      if(crawlQuit){
-                          clearInterval(crawlInterval);
-                          process.exit();
-                      }
-
-                  },config.interval)
+                      nextPageUrl = self.getNextPageUrl(pageUrlRule);
+                  }, config.interval);
 
               }else{
                   while(nextPageUrl = getNextPageUrl(pageUrlRule)){
 
-                      generateCrawlUrls(nextPageUrl);
-                      if(crawlQuit){
-                          Log.info("exit");
-                      }
                   }
               }
           })
@@ -130,66 +110,55 @@ class crawler {
     async getContentUrls(pageUrl){
         let pageContent = await Downloader.get(pageUrl);
         let urls = [];
-        let Extract = new Extract();
         //通过选择器匹配URL
         if(config.contentUrlSelector){
+            //css默认选择器
             let pageContent = res.text;
             if(config.onProcessPageContent){
                 pageContent = config.onProcessPageContent(pageContent);
             }
-            if(pageContent){
-                let $ = cheerio.load(pageContent);
-                config.contentUrlSelector.forEach((urlSelector,index) => {
-                    Log.info(urlSelector);
-                    $(urlSelector).each(function (idx, element) {
-                        let $element = $(element);
-                        if($element){
-                            urls.push($element.attr('href'));
-                        }
-                    });
-                })
+            if(config.onProcessPageContentUrl){
+                let _urls = config.onProcessPageContentUrl(pageContent);
+                if(_urls){
+                    urls.concat(_urls);
+                }
             }else{
-                reject("can not extract content url");
+              if(pageContent){
+                  let extractor = new Extractor(pageContent);
+                  config.contentUrlSelector.forEach((urlSelector,index) => {
+                      let urlSelectorReuslts = extractor.css(urlSelector);
+                      if(urlSelectorReuslts){
+                        urlSelectorReuslts.forEach((element, index) => {
+                            urls.push(element.text());
+                        });
+                      }
+                  })
+              }
             }
-
-        }else{
-            Log.info(urls);
         }
-        Log.info(urls);
-        resolve(urls);
+        return urls;
     }
-});
-    }
-    //获取下一页
+
+    //获取下一页url
     getNextPageUrl(pageUrlRule){
         //自定义翻页url优先
-        if(config.nextPageUrl){
-            return config.nextPageUrl();
+        if(config.nextPageUrls){
+            return config.nextPageUrls();
         }else if(pageUrlRule){
-            if(cursor > maxPage){
-                cursor = maxPage = 0;
-                basePageUrl = "";
+            //初始化翻页规则
+            let pageUrlRuleScheme = this.initPageUrlRule(pageUrlRule);
+            //m-n
+            if(pageUrlRuleScheme.cursor > this.maxPage){
                 return false;
-            }else if(cursor === 0 && maxPage === 0){
-                let match = pageUrlRule.match(/\[([0-9,-]+)\]/);
-                if(match){
-                    basePageUrl = pageUrlRule.substring(0,match['index']);
-                    match = match[1].split("-");
-                    cursor = match[0];
-                    maxPage = match[match.length - 1];
-                }else{
-                    return false;
-                }
             }
-            let url = basePageUrl + (cursor++);
-            Log.info(url);
-            return url;
-
+            this.initPageUrlRule(pageUrlRule, ++pageUrlRuleScheme.cursor);
+            return pageUrlRuleScheme.base ? pageUrlRuleScheme.base.replace("{%s}", pageUrlRuleScheme.cursor) : false;
         }else{
-            Log.info('input page url rule');
             return false;
         }
     }
+
+
 
     //add url to queue
     generateCrawlUrls(pageUrl){
@@ -221,6 +190,37 @@ class crawler {
         });
     }
 
+    getPageUrlRules(){
+        return this.config.pageUrlRules ?: false;
+    }
+    //目前只支持，0-1000这样的规则匹配
+    //http://www.x.com/article/page/[1-2000].html
+    initPageUrlRule(pageUrlRule, cursor){
+        let key = crypt.md5((pageUrlRule);
+        if(!this.pageUrlRules[key]){
+          let match = pageUrlRule.match(/\[([0-9,-]+)\]/);
+          let basePageUrl = "";
+          let cursor = 0;
+          let maxPage = 0;
+          if(match){
+              basePageUrl = pageUrlRule.replace(/\[([0-9,-]+)\]/,"{%s}");
+              match = match[1].split("-");
+              cursor = match[0];
+              maxPage = match[match.length - 1];
+          }else{
+              basePageUrl = pageUrlRule;
+          }
+          this.pageUrlRules[key] = {
+              base:basePageUrl,
+              cursor:cursor;
+              maxPage:maxPage
+          };
+        }
+        if(cursor){
+            this.pageUrlRules[key].cursor = cursor;
+        }
+        return this.pageUrlRules[key];
+    }
 
 }
 

@@ -1,7 +1,7 @@
 'use strict';
 const cheerio = require('cheerio');
 const xpath = require('xpath'), dom = require('xmldom').DOMParser;
-class extract{
+class extractor{
     constructor(text,selector) {
         this._text = text;
         this._selector = selector;
@@ -44,4 +44,4 @@ class extract{
         return this;
     }
 }
-module.exports = extract;
+module.exports = extractor;
