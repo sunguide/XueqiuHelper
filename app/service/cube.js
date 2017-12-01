@@ -46,7 +46,7 @@ module.exports = app => {
                         let stock_weight = parseFloat($(item).find(".stock-weight").html());
                         weights.push({stock_name, stock_code, stock_weight});
                         positions += stock_weight;
-                        co(ctx.service.cube.addCubePosition({id, date, stock_name, stock_code, stock_weight}));
+                        co(ctx.service.cube.addCubePosition({id, date, uid, stock_name, stock_code, stock_weight}));
                         //cube_postions
 
                     });
@@ -84,7 +84,7 @@ module.exports = app => {
 
         * addCubePosition(data){
             let ctx = this.ctx;
-            let conditions = {id: data.id, date: data.date, stock_code:data.stock_code};
+            let conditions = {id: data.id, uid:data.uid, date: data.date, stock_code:data.stock_code};
             console.log(conditions);
             ctx.model.XueqiuCubePosition.find(conditions, function (err, exist) {
                 if(err){

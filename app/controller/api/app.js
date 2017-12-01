@@ -14,7 +14,7 @@ module.exports = app => {
                     this.error("应用已经存在")
                 }else{
                     let model = new this.ctx.model.App(data);
-                    result = yield model.save();
+                    result = model.save();
                     if(result){
                         this.success(data,"注册成功")
                     }else{

@@ -18,6 +18,7 @@ module.exports = app => {
   app.get('/schedule', 'schedule.index');
   app.get('/schedule/dispatch', 'schedule.dispatch');
   app.get('/test/redisPub', 'test.redisPub');
+  app.get('/test/notifyLHB', 'test.notifyLHB');
 
   app.get('/v2/api/register','api.user.register');
   app.get('/v2/api/login','api.user.login');

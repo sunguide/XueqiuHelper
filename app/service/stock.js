@@ -1,66 +1,34 @@
 'use strict';
 
 module.exports = app => {
-    /**
-     * HackerNews Api Service
-     */
     class stock extends app.Service {
         constructor(ctx) {
             super(ctx);
         }
-
-        /**
-         * request hacker-news api
-         * @param {String} api - Api name
-         * @param {Object} [opts] - urllib options
-         * @return {Promise} response.data
-         */
-        * request(api, opts) {
-            const options = Object.assign({
-                dataType: 'json',
-                timeout: [ '30s', '30s' ],
-            }, opts);
-
-            const result = yield this.ctx.curl(`${this.serverUrl}/${api}`, options);
-            return result.data;
+        * notifyLHB(stockCode,imageURL){
+            let date = this.ctx.helper.datetime("YYYYMMDD");
+            let fromId = 3595607502;
+            let condition = {date:date,stock_code:stockCode,stock_weight:{$gt:0}};
+            let users = yield this.ctx.model.XueqiuCubePosition.find(condition);
+            console.log(users);
+            if(users && users.length > 0){
+                for(let i = 0; i< users.length;i++){
+                    //发送龙虎榜通知
+                    if(users[i].uid){
+                        let result = yield this.ctx.service.xueqiu.chat(fromId,users[i].uid,{image:imageURL});
+                        if(result){
+                            if(!app.redis.get(stockCode + date)){
+                                let stockName = users[i].stock_name;
+                                yield this.ctx.service.chat(fromId,uid,`今日您的股票${stockName}龙虎榜已经为您送上，请查阅，如果想取消订阅，请回复取消。`);
+                                app.redis.set(stockCode + date,1);
+                            }
+                        }
+                    }
+                }
+            }
         }
+        chatQueue(){
 
-        /**
-         * get top story ids
-         * @param {Number} [page] - page number, 1-base
-         * @param {Number} [pageSize] - page count
-         * @return {Promise} id list
-         */
-        * getTopStories(page, pageSize) {
-            page = page || 1;
-            pageSize = pageSize || this.pageSize;
-
-            const result = yield this.request('topstories.json', {
-                data: {
-                    orderBy: '"$key"',
-                    startAt: `"${pageSize * (page - 1)}"`,
-                    endAt: `"${pageSize * page - 1}"`,
-                },
-            });
-            return Object.keys(result).map(key => result[key]);
-        }
-
-        /**
-         * query item
-         * @param {Number} id - itemId
-         * @return {Promise} item info
-         */
-        * getItem(id) {
-            return yield this.request(`item/${id}.json`);
-        }
-
-        /**
-         * get user info
-         * @param {Number} id - userId
-         * @return {Promise} user info
-         */
-        * getUser(id) {
-            return yield this.request(`user/${id}.json`);
         }
     }
 

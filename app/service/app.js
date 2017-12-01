@@ -14,11 +14,11 @@ module.exports = app => {
         }
 
         async getConfig(id) {
-            return await this.request(`item/${id}.json`);
+            return await this.ctx.model.app.find(id)
         }
 
         async getApp(id) {
-            return yield this.request(`user/${id}.json`);
+            return await this.ctx.model.app.find(id)
         }
     }
 

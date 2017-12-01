@@ -356,11 +356,11 @@ module.exports = app => {
             });
         }
         //是否发布到雪球
-        * setPostedXueqiu(identify, docData, success){
+        * setPostedXueqiu(identify, docData){
             const Datastore = require('nedb');
             const db = new Datastore({ filename: './data/database/post_record.db', autoload: true });
             return new Promise((resolve, reject) => {
-                let data = {identify:identify,data:docData,success:success};
+                let data = {identify:identify,data:docData,success:docData.success};
                 db.find({identify:identify}, function (err, docs) {
                     if(err){
                         reject(err);

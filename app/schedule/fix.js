@@ -14,7 +14,7 @@ module.exports = {
         let cubes = false;
         let offset = 0;
         let limit = 100;
-        while (cubes = yield ctx.model.XueqiuCube.find({positions:{$gt:0},date:20171117}).find().limit(limit).skip(offset)){
+        while (cubes = yield ctx.model.XueqiuCube.find({positions:{$gt:0},date:20171201}).find().limit(limit).skip(offset)){
             for(let i = 0;i<cubes.length;i++){
 
                 if(cubes[i].weights.length > 0){
@@ -22,7 +22,7 @@ module.exports = {
                       let stock_code = cubes[i].weights[k].stock_code;
                       let stock_name = cubes[i].weights[k].stock_name;
                       let stock_weight = cubes[i].weights[k].stock_weight;
-                      let data = {id:cubes[i].id,date:cubes[i].date,stock_code,stock_name,stock_weight};
+                      let data = {id:cubes[i].id,uid:cubes[i].uid,date:cubes[i].date,stock_code,stock_name,stock_weight};
                       yield ctx.service.cube.addCubePosition(data);
                     }
                 }

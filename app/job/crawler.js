@@ -28,4 +28,4 @@ class crawler extends Subscription {
   }
 }
 
-module.exports = download;
+module.exports = crawler;
