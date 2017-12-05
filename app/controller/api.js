@@ -2,8 +2,9 @@
 const moment = require("moment");
 module.exports = app => {
     class apiController extends app.Controller {
-        * index() {
-            this.ctx.body = "hddd";
+        * index(ctx) {
+            const info = yield ctx.service.xuangubao.getNews();
+            this.ctx.body = info;
         }
 
         * messages(req, res) {

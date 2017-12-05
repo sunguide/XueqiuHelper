@@ -54,11 +54,13 @@ module.exports = app => {
             return _.uniq(posters);
         }
 
-        * post(message,title) {
+        * post(message,title,cookie) {
             let urls = this.urls;
-            let token = yield this.getToken();
             let base_headers = this.base_headers;
-            let cookie = yield this.getLoginCookie();
+            if(!cookie){
+                cookie = yield this.getLoginCookie();
+            }
+            let token = yield this.getToken(cookie);
             let form = {
                 "status": message,
                 "session_token": token
@@ -214,8 +216,10 @@ module.exports = app => {
                     });
             });
         }
-        * getToken() {
-            let cookie = yield this.getLoginCookie();
+        * getToken(cookie) {
+            if(!cookie){
+                cookie = yield this.getLoginCookie();
+            }
             let base_headers = this.base_headers;
             let urls = this.urls;
             return new Promise(function (resolve, reject) {

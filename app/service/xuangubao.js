@@ -6,10 +6,49 @@ module.exports = app => {
             super(ctx);
         }
         * getNews(){
-            let lastId = this.ctx.app.redis.get("xuangubao_last_id");
-            let current = Date.now()/1000;
-            let results = yield this.ctx.curl(`https://api.xuangubao.cn/api/pc/msgs?tailmark=${current}&limit=30&subjids=9,10,35,469`)
+            let lastId = yield this.ctx.app.redis.get("xuangubao_last_id");
+            let current = Math.floor(Date.now()/1000);
+            let results = yield this.ctx.curl(`https://api.xuangubao.cn/api/pc/msgs?tailmark=${current}&limit=30&subjids=9,10,35,469`, {dataType: 'json' })
 
+            if(results.data && results.data.NewMsgs){
+                let msgs = results.data.NewMsgs;
+                msgs = msgs.reverse();
+                let cookie = yield this.ctx.service.xueqiu.getLoginCookie({
+                    username: "sunguide2@wolfunds.com",
+                    password: "sunguide1989"
+                });
+                for(let i = 0;i< msgs.length;i++){
+                    if(msgs[i].Id <= lastId){
+                        break;
+                    }else{
+                        yield this.ctx.app.redis.set("xuangubao_last_id",msgs[i].Id);
+                        let message = msgs[i].Title;
+                        let title = "";
+                        if(msgs[i].Summary){
+                            message = msgs[i].Summary;
+                            title = msgs[i].Title;
+                        }
+                        if(message){
+                            if(msgs[i].Stocks){
+                                for(let k = 0; k< msgs[i].Stocks.length;k++){
+                                    let stock_code = getStockCode(msgs[i].Stocks[k].Symbol);
+                                    message += "  $" + msgs[i].Stocks[k].Name + "("+stock_code+")$  ";
+                                }
+                            }
+                            yield this.ctx.service.xueqiu.post(message,title,cookie);
+                        }
+                    }
+                }
+            }
+
+            function getStockCode(code) {
+                if(code.indexOf(".SZ") > 0 || code.indexOf(".SH")){
+                    code = code.split(".");
+                    return code[1]+code[0];
+                }
+                return code;
+            }
+            return results;
         }
     }
 

@@ -19,7 +19,7 @@ describe('getTodayStockInfo()', () => {
     });
     it('should get null when user not exists', function* () {
         const ctx = app.mockContext();
-        const info = yield ctx.service.xueqiu.getTodayStockInfo('777777');
+        const info = yield ctx.service.xueqiu.getTodayStockInfo('300100');
         assert(!info);
     });
 });
