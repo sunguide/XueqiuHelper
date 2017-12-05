@@ -91,6 +91,10 @@ module.exports = app => {
             console.log("job comming");
         }
 
+        * notifyLHB(){
+            yield this.service.stock.notifyLHB("SZ002194","https://xqimg.imedao.com/1601138f5dd3373fd99e1e75.jpg");
+        }
+
     }
     return bonusController;
 };

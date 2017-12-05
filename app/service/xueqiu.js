@@ -90,10 +90,10 @@ module.exports = app => {
                             console.log("请重发");
                             resolve(-1)
                         } else if (resData && resData.error_code) {
-                            resolve(false)
+                            resolve(false);
                         } else {
                             console.log("发布成功");
-                            resolve(true)
+                            resolve(resData);
                         }
                     });
             });
@@ -108,8 +108,12 @@ module.exports = app => {
                 "toId":toId,
                 "toGroup":false,
                 "sequenceId": this.getSequenceId(),
-                "plain":message
             };
+            if(typeof message == "object" && message.image){
+                data.image = message.image;
+            }else{
+                data.plain = message;
+            }
             let ctx = this.ctx;
             return new Promise((resolve, reject) => {
                 request.post("https://im" + Math.round(9 * Math.random()) + ".xueqiu.com/im-comet/v2/messages.json")

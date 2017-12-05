@@ -356,11 +356,11 @@ module.exports = app => {
             });
         }
         //是否发布到雪球
-        * setPostedXueqiu(identify, docData, success){
+        * setPostedXueqiu(identify, docData){
             const Datastore = require('nedb');
             const db = new Datastore({ filename: './data/database/post_record.db', autoload: true });
             return new Promise((resolve, reject) => {
-                let data = {identify:identify,data:docData,success:success};
+                let data = {identify:identify,data:docData,success:docData.success};
                 db.find({identify:identify}, function (err, docs) {
                     if(err){
                         reject(err);
@@ -447,7 +447,8 @@ module.exports = app => {
                 {"name":"华泰证券上海武定路证券营业部","alias":"新生代游资"},
                 {"name":"华泰证券股份有限公司上海武定路证券营业部","alias":"新生代游资"},
                 {"name":"华泰证券北京雍和宫证券营业部","alias":"牛散唐汉若"},
-                {"name":"华泰证券股份有限公司北京雍和宫证券营业部","alias":"牛散唐汉若"}
+                {"name":"华泰证券股份有限公司北京雍和宫证券营业部","alias":"牛散唐汉若"},
+                {"name":"国泰君安证券股份有限公司南京太平南路证券营业部","alias":"知名游资『作手新一』"}
             ];
         }
 

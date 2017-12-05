@@ -71,9 +71,17 @@ module.exports = {
                         + '</p>' + posters + comments + '<div class="img-single-upload"><img src="' + uploadImageURL + '" class="ke_img">' + secret + '</div>',
                     result = yield this.service.xueqiu.post(message,title);
                 if (result) {
-                    yield this.service.longhubang.setPostedXueqiu(identify, {"message": message}, true);
+                    yield this.service.longhubang.setPostedXueqiu(identify, {"message": message, success:true});
+                    this.service.stock.notifyLHB({
+                        "id":result.id,
+                        "uid":result.user_id,
+                        "title":title,
+                        "content":message,
+                        "image":uploadImageURL,
+                        "created_at": result.created_at
+                    });
                 } else {
-                    yield this.service.longhubang.setPostedXueqiu(identify, {"message": message}, false);
+                    yield this.service.longhubang.setPostedXueqiu(identify, {"message": message, success:false});
                 }
                 if (lhbs[i].stock_code < 600000) {
                     multi.sz = 1;
