@@ -34,6 +34,12 @@ module.exports = app => {
                                     message += "  $" + msgs[i].Stocks[k].Name + "("+stock_code+")$  ";
                                 }
                             }
+
+                            if(msgs[i].BkjInfoArr){
+                                for(let k = 0; k< msgs[i].BkjInfoArr.length;k++){
+                                    message += " #" + msgs[i].BkjInfoArr[k].Name + "# ";
+                                }
+                            }
                             let posted = yield this.ctx.service.xueqiu.post(message,title,cookie);
                             if(posted){
                                 yield this.ctx.app.redis.set("xuangubao_last_id",msgs[i].Id);

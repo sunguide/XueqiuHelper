@@ -72,14 +72,14 @@ module.exports = {
                     result = yield this.service.xueqiu.post(message,title);
                 if (result) {
                     yield this.service.longhubang.setPostedXueqiu(identify, {"message": message, success:true});
-                    this.service.stock.notifyLHB({
-                        "id":result.id,
-                        "uid":result.user_id,
-                        "title":title,
-                        "content":message,
-                        "image":uploadImageURL,
-                        "created_at": result.created_at
-                    });
+                    // this.service.stock.notifyLHB({
+                    //     "id":result.id,
+                    //     "uid":result.user_id,
+                    //     "title":title,
+                    //     "content":message,
+                    //     "image":uploadImageURL,
+                    //     "created_at": result.created_at
+                    // });
                 } else {
                     yield this.service.longhubang.setPostedXueqiu(identify, {"message": message, success:false});
                 }
