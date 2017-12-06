@@ -19,7 +19,7 @@ module.exports = app => {
                 });
                 for(let i = 0;i< msgs.length;i++){
                     if(msgs[i].Id <= lastId){
-                        break;
+                        continue;
                     }else{
                         let message = msgs[i].Title;
                         let title = "";
@@ -49,8 +49,11 @@ module.exports = app => {
             }
 
             function getStockCode(code) {
-                if(code.indexOf(".SZ") > 0 || code.indexOf(".SH")){
+                if(code.indexOf(".SZ") > 0 || code.indexOf(".SH") || code.indexOf(".SS")){
                     code = code.split(".");
+                    if(code[1] == "SS"){
+                        return "SH"+code[0];
+                    }
                     return code[1]+code[0];
                 }
                 return code;
