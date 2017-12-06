@@ -9,7 +9,7 @@ module.exports = app => {
             let lastId = yield this.ctx.app.redis.get("xuangubao_last_id");
             let current = Math.floor(Date.now()/1000);
             let results = yield this.ctx.curl(`https://api.xuangubao.cn/api/pc/msgs?tailmark=${current}&limit=30&subjids=9,10,35,469`, {dataType: 'json' })
-
+            console.log("start:getNews");
             if(results.data && results.data.NewMsgs){
                 let msgs = results.data.NewMsgs;
                 msgs = msgs.reverse();
@@ -21,7 +21,6 @@ module.exports = app => {
                     if(msgs[i].Id <= lastId){
                         break;
                     }else{
-                        yield this.ctx.app.redis.set("xuangubao_last_id",msgs[i].Id);
                         let message = msgs[i].Title;
                         let title = "";
                         if(msgs[i].Summary){
@@ -35,10 +34,18 @@ module.exports = app => {
                                     message += "  $" + msgs[i].Stocks[k].Name + "("+stock_code+")$  ";
                                 }
                             }
-                            yield this.ctx.service.xueqiu.post(message,title,cookie);
+                            let posted = yield this.ctx.service.xueqiu.post(message,title,cookie);
+                            if(posted){
+                                yield this.ctx.app.redis.set("xuangubao_last_id",msgs[i].Id);
+                            }else{
+                                console.log("post fail");
+                            }
                         }
                     }
                 }
+            }else{
+                console.log("fetch xuangubao news fail");
+                console.log(results);
             }
 
             function getStockCode(code) {
