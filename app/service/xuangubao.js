@@ -28,6 +28,7 @@ module.exports = app => {
                             title = msgs[i].Title;
                         }
                         if(message){
+                            message.replace("选股宝讯，","");
                             if(msgs[i].Stocks){
                                 for(let k = 0; k< msgs[i].Stocks.length;k++){
                                     let stock_code = getStockCode(msgs[i].Stocks[k].Symbol);

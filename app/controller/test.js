@@ -92,7 +92,13 @@ module.exports = app => {
         }
 
         * notifyLHB(){
-            yield this.service.stock.notifyLHB("SZ002194","https://xqimg.imedao.com/1601138f5dd3373fd99e1e75.jpg");
+            let imageURL = "./images/000010_20171019.jpg";
+            imageURL = yield this.ctx.service.xueqiu.chatUploadImage(6509727695,imageURL);
+            console.log(imageURL);
+            let result = yield this.ctx.service.xueqiu.chat(3595607502,6509727695,{image:imageURL});
+            console.log(result);
+
+            // yield this.service.stock.notifyLHB("SZ002194","https://xqimg.imedao.com/1601138f5dd3373fd99e1e75.jpg");
         }
 
     }

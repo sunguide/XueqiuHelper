@@ -5,7 +5,7 @@ module.exports = app => {
         constructor(ctx) {
             super(ctx);
         }
-        * notifyLHB(stockCode,imageURL){
+        * notifyLHB(stockCode,imagePath){
             let date = this.ctx.helper.datetime("YYYYMMDD");
             let fromId = 3595607502;
             let condition = {date:date,stock_code:stockCode,stock_weight:{$gt:0}};
@@ -15,6 +15,7 @@ module.exports = app => {
                 for(let i = 0; i< users.length;i++){
                     //发送龙虎榜通知
                     if(users[i].uid){
+                        let imageURl = yield this.ctx.service.xueqiu.chatUploadImage(users[i].uid,imagePath);
                         let result = yield this.ctx.service.xueqiu.chat(fromId,users[i].uid,{image:imageURL});
                         if(result){
                             if(!app.redis.get(stockCode + date)){

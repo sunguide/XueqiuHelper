@@ -177,6 +177,30 @@ module.exports = app => {
                   });
           });
         }
+        * chatUploadImage(toUserId,imagePath,cookie){
+            if(!cookie){
+                cookie = yield this.getLoginCookie();
+            }
+            let urls = this.urls;
+            let base_headers = this.base_headers;
+            return new Promise((resolve, reject) => {
+                request.post("https://xueqiu.com/photo/im/upload.json?base_content_type=text/html&content_type=text&to_id="+toUserId+"&type=2")
+                    .set(base_headers)
+                    .set("Cookie", cookie)
+                    .attach('file', imagePath)
+                    .field('filename', imagePath)
+                    .end((err,res) => {
+                        if(err) reject(err);
+                        let resData = JSON.parse(res.text);
+                        if(resData.url){
+                            resolve(resData.url + '/' + resData.filename + "?" +resData.width +"x" + resData.height);
+                        }else{
+                            resolve(false);
+                        }
+                    });
+            });
+
+        }
         * uploadImage(filePath){
             let cookie = yield this.getLoginCookie();
             let urls = this.urls;
