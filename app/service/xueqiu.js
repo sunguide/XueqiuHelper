@@ -323,6 +323,104 @@ module.exports = app => {
                   });
           });
         }
+
+        * getUserPostsByUserId(uid, cookie){
+            if(!cookie){
+                cookie = yield this.getLoginCookie();
+            }
+            let base_headers = this.base_headers;
+            let url = "https://xueqiu.com/v4/statuses/user_timeline.json?page=1&user_id="+uid+"&type=0";
+            return new Promise(function (resolve, reject) {
+              request.get(url)
+                  .set(base_headers)
+                  .set("Cookie", cookie)
+                  .end((err, res) => {
+                      if(err){
+                          reject(err);
+                      }else{
+                          let data = JSON.parse(res.text);
+                          if(data && data.statuses){
+                              resolve(data.statuses);
+                          }else{
+                              resolve(false);
+                          }
+                      }
+                  });
+            });
+        }
+
+        * reply(id, comment, cookie){
+            if(!cookie){
+                cookie = yield this.getLoginCookie();
+            }
+            let base_headers = this.base_headers;
+
+            let token = yield this.ctx.service.xueqiu.getReplyToken(id, cookie);
+
+            let params = {
+                comment:`<p>${comment}</p>`,
+                forward:0,
+                id:id,
+                session_token:token
+            }
+            console.log(params);
+            let url = "https://xueqiu.com/statuses/reply.json";
+            return new Promise(function (resolve, reject) {
+              request.post(url)
+                  .set(base_headers)
+                  .set("Cookie", cookie)
+                  .type("form")
+                  .send(params)
+                  .redirects(0)
+                  .end((err, res) => {
+                      if(err){
+                          reject(err);
+                      }else{
+                          let data = JSON.parse(res.text);
+                          if(data){
+                              resolve(data);
+                          }else{
+                              resolve(false);
+                          }
+                      }
+                  });
+            });
+        }
+
+        * getReplyToken(id, cookie){
+          if(!cookie){
+              cookie = yield this.getLoginCookie();
+          }
+          let now = Date.now();
+          let base_headers = this.base_headers;
+          let url = "https://xueqiu.com/statuses/allow_reply.json?status_id="+id+"&_="+now;
+          return new Promise(function (resolve, reject) {
+            request.get(url)
+                .set(base_headers)
+                .set("Cookie", cookie)
+                .end((err, res) => {
+                    if(err){
+                        reject(err);
+                    }else{
+                      request.get("https://xueqiu.com/provider/session/token.json?api_path=%2Fstatuses%2Freply.json&_="+now)
+                          .set(base_headers)
+                          .set("Cookie", cookie)
+                          .end((err, res) => {
+                              if(err){
+                                  reject(err);
+                              }else{
+                                  let data = JSON.parse(res.text);
+                                  if(data && data.session_token){
+                                      resolve(data.session_token);
+                                  }else{
+                                      resolve(false);
+                                  }
+                              }
+                          });
+                    }
+                });
+          });
+        }
         * getLoginCookie(options) {
             let urls = this.urls;
             let loginPass = {
