@@ -19,7 +19,7 @@ let kue = require('kue'),
 const crawled_collection_name = "crawled_hub";
 const attach_collection_name = "attach_hub";
 const upload_dir = "./attachments/";
-
+const downloader = new Downloader();
 class crawler {
     constructor(config) {
         this.config = config;
@@ -76,17 +76,6 @@ class crawler {
       //根据分页规则抓取
       if(config.pageUrlRules && config.pageUrlRules.length > 0){
           let nextPageUrl = "";
-          Promise.map(this.config.pageUrlRules, pageUrlRule => {
-              return fs.readFileAsync(fileName).then(JSON.parse).catch(SyntaxError, function(e) {
-                  e.fileName = fileName;
-                  throw e;
-              })
-          }, {concurrency: concurrency}).then(function(parsedJSONs) {
-              console.log(parsedJSONs);
-          }).catch(SyntaxError, function(e) {
-              console.log("Invalid JSON in file " + e.fileName + ": " + e.message);
-          });
-          //old
           config.pageUrlRules.forEach(function(pageUrlRule,index){
 
               if(config.interval){
@@ -95,12 +84,21 @@ class crawler {
                   }, config.interval);
 
               }else{
-                  while(nextPageUrl = getNextPageUrl(pageUrlRule)){
-
+                  while(nextPageUrl = self.getNextPageUrl(pageUrlRule)){
+                      let contentUrls = await self.getContentUrls(nextPageUrl);
+                      //加入到下载队列中
+                      if(contentUrls){
+                          for(let i=0;i<contentUrls.length;i++){
+                              downloader.enqueue({
+                                  app_id:config.app_id ?: config,
+                                  url:contentUrls[i]
+                              });
+                          }
+                      }
                   }
               }
           })
-      }else
+      }
       //根据指定URL,全站扫描 todo
       if(config.scanUrls && config.scanUrls.length > 0){
 
@@ -161,6 +159,7 @@ class crawler {
 
 
     //add url to queue
+
     generateCrawlUrls(pageUrl){
         getCrawlUrls(pageUrl).then(function(urls){
            if(urls){
@@ -173,7 +172,7 @@ class crawler {
                    };
                    crawlerModel.checkDownload(url,"html").then(function(hasDownload){
                        if(!hasDownload){
-                           let job = queue.create('crawl_download', data).removeOnComplete( true).save(function(err){
+                           let job = queue.create('crawl_download', data).removeOnComplete(true).save(function(err){
                                if( !err ) {
                                    Log.info(url+" add queue queue success:" + job.id);
                                }else{

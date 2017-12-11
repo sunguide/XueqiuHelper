@@ -1,25 +1,22 @@
 'use strict';
-const request = require('superaget');
+const Queue = require("./queue");
+
 class downloader {
-    constructor(text,selector) {
-        this._text = text;
-        this._selector = selector;
-        this._extract = null;
-        this.init();
+    constructor() {
+        this.queue = Queue.connect();
+    }
+    //下载器队列
+    //@app_id [应用id]
+    //@url [下载url]
+    async enqueue(data,options){
+        return this.queue.create('downloader_queue', data).save( function(err){
+           if( !err ) console.log( job.id );
+        });
     }
 
-    async get(){
-        let response = await request.get(url,options);
-        return this.processResponse(response);
-    }
-
-    async post(){
-        let response = await request.post(url,options);
-        return this.processResponse(response);
-    }
-
-    processResponse(){
+    async dequeue(){
 
     }
+
 }
 module.exports = downloader;
