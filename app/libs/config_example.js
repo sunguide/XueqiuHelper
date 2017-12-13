@@ -9,7 +9,7 @@ var configs = {
 
     contentUrlSelector:[".box h3 a"], //从抓取页面里匹配url
     pageUrlRegexes: ["http://www\\.leiphone\\.com/search\\?s=%E5%B1%B1%E5%AF%A8%E6%89%8B%E6%9C%BA&site=article(&page=\\d+)?"],
-    pageUrlRules: ["http://www.leiphone.com/site/AjaxLoad/page/[1-2000]"],
+    pageUrlRules: ["http://www.leiphone.com/site/AjaxLoad/page/[1-3]"],
 
     enableProxy: true,
     interval: 2000,

@@ -27,7 +27,24 @@ class extractor{
     }
     css(select){
         this.before('css');
-        return this._extract(select);
+        //自定义 css选取规则
+        //: 为提取符号
+        //attr 为提取方式
+        //[xxx,yyy] 其中 xxx,是提取内容
+
+        let matches = select.match(/:attr\[(a-Z,-_0-9)\]/g)
+        if(matches){
+            select = select.split(":attr[").[0];
+        }
+
+        let results = this._extract(select);
+        if(results.length > 0){
+            if(matches){
+
+            }else{
+
+            }
+        }
     }
     regex(pattern){
         this.before('regex');

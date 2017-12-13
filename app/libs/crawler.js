@@ -64,39 +64,31 @@ class crawler {
         }
 
         let pageUrls = await this.getPageUrls();
-
+        console.log(pageUrls);
 
     }
     async getPageUrls(){
       let config = this._config;
-      let self = this;console.log(config);
+      let self = this;
+      console.log(config);
       //根据分页规则抓取
       if(config.pageUrlRules && config.pageUrlRules.length > 0){
           let nextPageUrl = "";
           console.log(config.pageUrlRules);
-          config.pageUrlRules.forEach(function(pageUrlRule,index){
+          for(let i = 0; i < config.pageUrlRules.length; i++){
               console.log("page urls");
               if(!config.interval){
                   let crawlInterval = setInterval(function(){
-                      nextPageUrl = self.getNextPageUrl(pageUrlRule);
+                      nextPageUrl = self.getNextPageUrl(config.pageUrlRules[i]);
                   }, config.interval);
 
               }else{
-                  while(nextPageUrl = self.getNextPageUrl(pageUrlRule)){
-                      let contentUrls = self.getContentUrls(nextPageUrl);
-                      console.log(contentUrls);
-                      //加入到下载队列中
-                      if(contentUrls){
-                          for(let i=0;i<contentUrls.length;i++){
-                              downloader.enqueue({
-                                  app_id:(config.app_id ? config.app_id : config),
-                                  url:contentUrls[i]
-                              });
-                          }
-                      }
-                  }
+                  this.doProcessContentUrls(config.pageUrlRules[i]);
               }
-          })
+          }
+          config.pageUrlRules.forEach((pageUrlRule,index) => {
+
+          });
       }
       //根据指定URL,全站扫描 todo
       if(config.scanUrls && config.scanUrls.length > 0){
@@ -106,13 +98,13 @@ class crawler {
     //获取分页中的内容urls
     async getContentUrls(pageUrl){
         let config = this._config;
-        let pageContent = await downloader.get(pageUrl);
-        console.log(pageContent);return;
+        let res = await downloader.get(pageUrl);
+        let pageContent = res.text;
+
         let urls = [];
         //通过选择器匹配URL
         if(config.contentUrlSelector){
             //css默认选择器
-            let pageContent = res.text;
             if(config.onProcessPageContent){
                 pageContent = config.onProcessPageContent(pageContent);
             }
@@ -124,18 +116,45 @@ class crawler {
             }else{
                 if(pageContent){
                     let extractor = new Extractor(pageContent);
-                    config.contentUrlSelector.forEach((urlSelector,index) => {
+                    console.log("dddddd:f");
+                    for(let i = 0; i < config.contentUrlSelector.length; i++){
+                        let urlSelector = config.contentUrlSelector[i];
+                        console.log("ddddddddd"+urlSelector)
+
                         let urlSelectorReuslts = extractor.css(urlSelector);
+                        console.log(config.contentUrlSelector);
                         if(urlSelectorReuslts){
-                          urlSelectorReuslts.forEach((element, index) => {
-                              urls.push(element.text());
-                          });
+                            for(let i = 0; i < urlSelectorReuslts.length;i++){
+                                urls.push(urlSelectorReuslts[i]);
+                            }
                         }
-                    });
+                    }
+
                 }
             }
         }
+        console.log(urls);
+        console.log("urls:")
         return urls;
+    }
+
+    async doProcessContentUrls(pageUrlRule){
+        let nextPageUrl = await this.getNextPageUrl(pageUrlRule);
+        if(!nextPageUrl){
+            return ;
+        }
+        let contentUrls = await this.getContentUrls(nextPageUrl);
+        console.log(contentUrls);
+        //加入到下载队列中
+        if(contentUrls){
+            for(let i=0;i<contentUrls.length;i++){
+                downloader.enqueue({
+                    app_id:(config.app_id ? config.app_id : config),
+                    url:contentUrls[i]
+                });
+            }
+        }
+        await this.doProcessContentUrls(pageUrlRule);
     }
 
     //获取下一页url
@@ -216,7 +235,6 @@ class crawler {
               maxPage:maxPage
           };
         }
-        console.log("ddd") ;
         if(cursor){
             this._pageUrlRules[key].cursor = cursor;
         }

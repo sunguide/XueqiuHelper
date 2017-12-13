@@ -25,7 +25,7 @@ class downloader {
 
     }
     async get(url, options){
-        let cookie = options.cookie || "";
+        let cookie = options ? (options.cookie || "") : "";
         let base_headers = this.base_headers;
         return new Promise(resolve => {
             request.get(url)
