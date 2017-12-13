@@ -40,6 +40,18 @@ module.exports = app => {
             let ids = yield this.ctx.app.redis.llen("cube_ids");
             this.success({length:ids});
         }
+
+        * setCookie(){
+            let username = this.ctx.request.query.username;
+            let cookie = this.ctx.request.query.cookie;
+
+            if(username && cookie){
+                app.redis.set("user_" + username, cookie);
+                this.ctx.body = `[${username} ] set cookie [${cookie}] success`;
+            }else{
+                this.ctx.body = ` 参数不全`;
+            }
+        }
         * test(ctx) {
 
 

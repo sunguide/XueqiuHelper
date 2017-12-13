@@ -430,8 +430,14 @@ module.exports = app => {
                 captcha: ""
             };
             if(options){
-              loginPass.username = options.username;
-              loginPass.password = options.password;
+                loginPass.username = options.username;
+                loginPass.password = options.password;
+                if(loginPass.username){
+                    let designed_cookie = yield app.redis.get("user_"+loginPass.username);
+                    if(designed_cookie){
+                        return designed_cookie;
+                    }
+                }
             }
             let cookie = yield app.redis.get(loginPass.username);
             if(cookie){

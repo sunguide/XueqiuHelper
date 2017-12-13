@@ -7,9 +7,11 @@ module.exports = app => {
   app.get('/test', 'home.test');
 
   app.get('/api', 'api.index');
-  app.get('/test/test', 'test.index');
+  app.get('/api/cookie', 'api.setCookie');
   app.get('/api/test', 'api.test');
   app.post('/api/messages', 'api.messages');
+
+  app.get('/test/test', 'test.index');
   app.get('/login', 'home.login');
   app.post('/login', 'home.loginDo');
   app.get('/logout', 'home.logout');

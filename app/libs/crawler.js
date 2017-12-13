@@ -3,18 +3,12 @@ const fs = require("fs");
 const http = require("http");
 const path = require("path");
 const Promise = require('bluebird');
-const crypt = require("crypt");
+const crypt = require("./crypt");
 
 let Log = require('winston');
-
-let global_config = require('./config').config;
-
 const Downloader = require("./downloader");
 const Extractor = require("./extractor");
 
-//job queue
-let kue = require('kue'),
-    queue = kue.createQueue();
 //常量
 const crawled_collection_name = "crawled_hub";
 const attach_collection_name = "attach_hub";
@@ -22,43 +16,46 @@ const upload_dir = "./attachments/";
 const downloader = new Downloader();
 class crawler {
     constructor(config) {
-        this.config = config;
-        this.nextPageUrl = "";
-        //分页游标
-        this.cursor = 0;
-        this.maxPage = 0;
-        this.basePageUrl = "";
-        this.crawlQuit = false;
-        this.crawled_urls = [];
-
-        //默认抓取时间间隔
-        this.interval = 0;
-        this.timeout = 30000;
-        this.enableProxy = false;
-    }
-
-    init(){
-        if(isNaN(config.afterExtractField)){
-
-        }
+        this.config(config);
     }
 
     config(config){
-        this.config = config;
-        if(typeof this.config.interval == 'undefined'){
-            this.config.interval = interval;
+        this._config = config || {};
+        this._nextPageUrl = "";
+        //分页游标
+        this._cursor = 0;
+        this._maxPage = 0;
+        this._basePageUrl = "";
+        this._crawled_urls = [];
+        this._pageUrlRules = {};
+
+        //默认抓取时间间隔
+        this._interval = 0;
+        this._timeout = 30000;
+        this._enableProxy = false;
+
+
+        if(typeof this._config.interval === 'undefined'){
+            this._config.interval = this.interval;
         }
 
-        if(typeof this.config.timeout == 'undefined'){
-            this.config.timeout = timeout;
+        if(typeof this._config.timeout === 'undefined'){
+            this._config.timeout = this.timeout;
+        }
+    }
+
+    init(){
+
+        if(isNaN(this._config.afterExtractField)){
+
         }
     }
 
     filter(){
 
     }
-    start(){
-        let config = this.config;
+    async start(){
+        let config = this._config;
         this.init();
 
         //beforeCrawl
@@ -71,26 +68,28 @@ class crawler {
 
     }
     async getPageUrls(){
-      let config = this.config;
-      let self = this;
+      let config = this._config;
+      let self = this;console.log(config);
       //根据分页规则抓取
       if(config.pageUrlRules && config.pageUrlRules.length > 0){
           let nextPageUrl = "";
+          console.log(config.pageUrlRules);
           config.pageUrlRules.forEach(function(pageUrlRule,index){
-
-              if(config.interval){
+              console.log("page urls");
+              if(!config.interval){
                   let crawlInterval = setInterval(function(){
                       nextPageUrl = self.getNextPageUrl(pageUrlRule);
                   }, config.interval);
 
               }else{
                   while(nextPageUrl = self.getNextPageUrl(pageUrlRule)){
-                      let contentUrls = await self.getContentUrls(nextPageUrl);
+                      let contentUrls = self.getContentUrls(nextPageUrl);
+                      console.log(contentUrls);
                       //加入到下载队列中
                       if(contentUrls){
                           for(let i=0;i<contentUrls.length;i++){
                               downloader.enqueue({
-                                  app_id:config.app_id ?: config,
+                                  app_id:(config.app_id ? config.app_id : config),
                                   url:contentUrls[i]
                               });
                           }
@@ -106,7 +105,9 @@ class crawler {
     }
     //获取分页中的内容urls
     async getContentUrls(pageUrl){
-        let pageContent = await Downloader.get(pageUrl);
+        let config = this._config;
+        let pageContent = await downloader.get(pageUrl);
+        console.log(pageContent);return;
         let urls = [];
         //通过选择器匹配URL
         if(config.contentUrlSelector){
@@ -121,17 +122,17 @@ class crawler {
                     urls.concat(_urls);
                 }
             }else{
-              if(pageContent){
-                  let extractor = new Extractor(pageContent);
-                  config.contentUrlSelector.forEach((urlSelector,index) => {
-                      let urlSelectorReuslts = extractor.css(urlSelector);
-                      if(urlSelectorReuslts){
-                        urlSelectorReuslts.forEach((element, index) => {
-                            urls.push(element.text());
-                        });
-                      }
-                  })
-              }
+                if(pageContent){
+                    let extractor = new Extractor(pageContent);
+                    config.contentUrlSelector.forEach((urlSelector,index) => {
+                        let urlSelectorReuslts = extractor.css(urlSelector);
+                        if(urlSelectorReuslts){
+                          urlSelectorReuslts.forEach((element, index) => {
+                              urls.push(element.text());
+                          });
+                        }
+                    });
+                }
             }
         }
         return urls;
@@ -140,8 +141,8 @@ class crawler {
     //获取下一页url
     getNextPageUrl(pageUrlRule){
         //自定义翻页url优先
-        if(config.nextPageUrls){
-            return config.nextPageUrls();
+        if(this._config.nextPageUrls){
+            return this._config.nextPageUrls();
         }else if(pageUrlRule){
             //初始化翻页规则
             let pageUrlRuleScheme = this.initPageUrlRule(pageUrlRule);
@@ -190,13 +191,13 @@ class crawler {
     }
 
     getPageUrlRules(){
-        return this.config.pageUrlRules ?: false;
+        return this._config.pageUrlRules ? this._config.pageUrlRules : false;
     }
     //目前只支持，0-1000这样的规则匹配
     //http://www.x.com/article/page/[1-2000].html
     initPageUrlRule(pageUrlRule, cursor){
-        let key = crypt.md5((pageUrlRule);
-        if(!this.pageUrlRules[key]){
+        let key = crypt.md5(pageUrlRule);
+        if(typeof this._pageUrlRules[key] === "undefined"){
           let match = pageUrlRule.match(/\[([0-9,-]+)\]/);
           let basePageUrl = "";
           let cursor = 0;
@@ -209,16 +210,17 @@ class crawler {
           }else{
               basePageUrl = pageUrlRule;
           }
-          this.pageUrlRules[key] = {
+          this._pageUrlRules[key] = {
               base:basePageUrl,
-              cursor:cursor;
+              cursor:cursor,
               maxPage:maxPage
           };
         }
+        console.log("ddd") ;
         if(cursor){
-            this.pageUrlRules[key].cursor = cursor;
+            this._pageUrlRules[key].cursor = cursor;
         }
-        return this.pageUrlRules[key];
+        return this._pageUrlRules[key];
     }
 
 }
