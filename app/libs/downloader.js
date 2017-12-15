@@ -16,12 +16,18 @@ class downloader {
     //@app_id [应用id]
     //@url [下载url]
     async enqueue(data,options){
-        return this.queue.create('downloader_queue', data).save( function(err){
+        let job = this.queue.enqueue('downloader_queue', data).save( function(err){
            if( !err ) console.log( job.id );
         });
     }
 
-    async dequeue(){
+    async dequeue(doProcess){
+            console.log(this.queue.queue.process.toString());
+            this.queue.queue.process('downloader_queue', function(job, done){
+                console.log("do process");
+                doProcess(job, done);
+            });
+            console.log("do process end")
 
     }
     async get(url, options){
@@ -41,6 +47,9 @@ class downloader {
         });
     }
 
+    listen(){
+      
+    }
 
 
 }

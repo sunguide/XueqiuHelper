@@ -5,7 +5,7 @@ class download extends Subscription {
     return {
       type: 'worker',
       name: 'download',
-      immediate: false,
+      immediate: true,
     };
   }
   async subscribe() {

@@ -7,7 +7,7 @@ var configs = {
     helperUrlRegexes: ["http://www\\.leiphone\\.com/search\\?s=%E5%B1%B1%E5%AF%A8%E6%89%8B%E6%9C%BA&site=article(&page=\\d+)?"],
     //
 
-    contentUrlSelector:[".box h3 a"], //从抓取页面里匹配url
+    contentUrlSelector:[".box h3 a:attr[href]"], //从抓取页面里匹配url
     pageUrlRegexes: ["http://www\\.leiphone\\.com/search\\?s=%E5%B1%B1%E5%AF%A8%E6%89%8B%E6%9C%BA&site=article(&page=\\d+)?"],
     pageUrlRules: ["http://www.leiphone.com/site/AjaxLoad/page/[1-3]"],
 

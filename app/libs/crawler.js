@@ -83,8 +83,9 @@ class crawler {
                   }, config.interval);
 
               }else{
-                  this.doProcessContentUrls(config.pageUrlRules[i]);
+                  await this.doProcessContentUrls(config.pageUrlRules[i]);
               }
+              console.log("page urls end")
           }
           config.pageUrlRules.forEach((pageUrlRule,index) => {
 
@@ -116,13 +117,9 @@ class crawler {
             }else{
                 if(pageContent){
                     let extractor = new Extractor(pageContent);
-                    console.log("dddddd:f");
                     for(let i = 0; i < config.contentUrlSelector.length; i++){
                         let urlSelector = config.contentUrlSelector[i];
-                        console.log("ddddddddd"+urlSelector)
-
                         let urlSelectorReuslts = extractor.css(urlSelector);
-                        console.log(config.contentUrlSelector);
                         if(urlSelectorReuslts){
                             for(let i = 0; i < urlSelectorReuslts.length;i++){
                                 urls.push(urlSelectorReuslts[i]);
@@ -133,16 +130,16 @@ class crawler {
                 }
             }
         }
-        console.log(urls);
-        console.log("urls:")
         return urls;
     }
 
     async doProcessContentUrls(pageUrlRule){
         let nextPageUrl = await this.getNextPageUrl(pageUrlRule);
         if(!nextPageUrl){
+            console.log("no urls");
             return ;
         }
+        let config = this._config;
         let contentUrls = await this.getContentUrls(nextPageUrl);
         console.log(contentUrls);
         //加入到下载队列中
@@ -166,7 +163,7 @@ class crawler {
             //初始化翻页规则
             let pageUrlRuleScheme = this.initPageUrlRule(pageUrlRule);
             //m-n
-            if(pageUrlRuleScheme.cursor > this.maxPage){
+            if(pageUrlRuleScheme.cursor > pageUrlRuleScheme.maxPage){
                 return false;
             }
             this.initPageUrlRule(pageUrlRule, ++pageUrlRuleScheme.cursor);

@@ -30,21 +30,29 @@ class extractor{
         //自定义 css选取规则
         //: 为提取符号
         //attr 为提取方式
-        //[xxx,yyy] 其中 xxx,是提取内容
+        //[x,y] 其中 x和y 是提取内容
 
-        let matches = select.match(/:attr\[(a-Z,-_0-9)\]/g)
+        let matches = select.match(/:attr\[([a-zA-Z,_-]+)\]/)
         if(matches){
-            select = select.split(":attr[").[0];
+            select = select.split(":attr[")[0];
         }
 
         let results = this._extract(select);
+
+        let data = [];
         if(results.length > 0){
             if(matches){
-
+                for(let i =0; i< results.length;i++){
+                    data[i] = this._extract(results[i]).attr("href");
+                }
             }else{
-
+                for(let i =0; i< results.length;i++){
+                    data[i] = this._extract(results[i]).text();
+                }
             }
         }
+
+        return data;
     }
     regex(pattern){
         this.before('regex');

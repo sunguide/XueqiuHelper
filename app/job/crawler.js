@@ -17,9 +17,6 @@ class crawler extends Subscription {
         if(!(job.config)) {
           return done(new Error('crawler config must present'));
         }
-
-
-
         done("done success");
       }
   }
