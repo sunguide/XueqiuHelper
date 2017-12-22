@@ -24,7 +24,6 @@ class queue{
                 process.exit( 0 );
             });
         });
-        kue.app.listen(3000);
         return this;
     }
 
