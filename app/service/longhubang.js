@@ -111,7 +111,7 @@ module.exports = app => {
              app.cache.set("quote_" + lhb.stock_code, lhb.closing_quote, 60000);
           }
           let gm = require("gm");
-          let img = gm(900, 1000, "#e4f2ff")
+          let img = gm(900, 800, "#e4f2ff")
               .font('./data/font/msyh.ttf')      //引入预先下载的黑体字库
               .fontSize(26)
               .drawText(30, 40, lhb.title)
@@ -200,13 +200,15 @@ module.exports = app => {
               img.drawText(600,880, "https://xueqiu.com/longhubang");
               let filepath = './images/' + lhb.identify + ".jpg";
               return new Promise((resolve, reject) => {
-                img.write(filepath,function (err) {
+                img.quality(90)
+                    .write(filepath,function (err) {
                     if(err){
                         reject(err);
                     }else{
                         console.log('gene image');
                         gm("./data/images/top.jpg")
                             .append(filepath)
+                            .append("./data/images/ad.jpg")
                             .write(filepath,function (err) {
                                 if(err){
                                     reject(err);
