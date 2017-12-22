@@ -16,7 +16,7 @@ module.exports = app => {
             let start = Date.now();
             let queue = new Queue();
             let crawler = new Crawler();
-            queue.dequeue("crawler_queue",function(job,done){
+            queue.queue.process("crawler_queue",function(job, done){
                 let config = job.data.config;
                 crawler.config(config);
                 console.log(crawler._config);

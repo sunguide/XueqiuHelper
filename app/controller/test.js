@@ -57,6 +57,10 @@ module.exports = app => {
 
 
             return;
+
+        }
+
+        * geneLHBImage(){
             let lhb = {
                 stock_code: '603963',
                 stock_name: '大理药业',
@@ -81,11 +85,8 @@ module.exports = app => {
                         [ '国泰君安证券股份有限公司顺德东乐路证券营业部', '0.00', '1346.55', '-1346.55' ] ] }
 
 
-            let comments = yield this.service.longhubang.analyze(lhb);
-            this.ctx.body = comments;
-
+            yield this.service.longhubang.geneImage(lhb);
         }
-
         * redisPub(){
             yield this.app.redis.publish("job","job coming");
             console.log("job comming");

@@ -17,10 +17,12 @@ module.exports = app => {
   app.get('/logout', 'home.logout');
   app.get('/bonus', 'bonus.index');
   app.get('/cubes', 'cube.index');
+  app.get('/crawler/test', 'crawler.test');
   app.get('/schedule', 'schedule.index');
   app.get('/schedule/dispatch', 'schedule.dispatch');
   app.get('/test/redisPub', 'test.redisPub');
   app.get('/test/notifyLHB', 'test.notifyLHB');
+  app.get('/test/lhbimage','test.geneLHBImage');
 
   app.get('/v2/api/register','api.user.register');
   app.get('/v2/api/login','api.user.login');

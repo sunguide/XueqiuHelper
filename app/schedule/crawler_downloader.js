@@ -15,13 +15,24 @@ module.exports = app => {
             let start = Date.now();
             let downloader = new Downloader();
             downloader.dequeue(startDownload);
-            function startDownload(job, done) {
-                if(!(job.data.url)) {
+            async function startDownload(job, done) {
+                if(!job.data.url) {
                     return done(new Error('invalid url address'));
                 }else{
-
+                    console.log(job.data.url);
+                    try{
+                        let res = await Downloader.get(job.data.url);
+                        let data = {app_id:job.data.app_id,data:res.text};
+                        let Cube = new ctx.model.CrawlerThing(data);
+                        Cube.save();
+                        console.log(res.text);
+                        done();
+                    }catch(err){
+                        console.log(err);
+                        done(new Error('fetch fail'+err.toString()));
+                    };
                 }
-                console.log(job.data.url);
+
             }
 
             let costTime = parseFloat(Date.now() - start);
