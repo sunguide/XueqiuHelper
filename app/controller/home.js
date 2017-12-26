@@ -14,6 +14,7 @@ module.exports = app => {
         }
 
         * login(){
+            this.ctx.body = app.config.env;return;
             yield this.ctx.render('home/login.tpl');
         }
 

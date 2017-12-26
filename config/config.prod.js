@@ -18,7 +18,7 @@ module.exports = appInfo => {
         serverUrl: 'https://hacker-news.firebaseio.com/v0',
     };
 
-    config.env = "local";
+    config.env = "prod";
 
     config.mongoose = {
         url: 'mongodb://10.0.30.61/xueqiu_helper',
