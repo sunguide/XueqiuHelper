@@ -5,7 +5,7 @@ module.exports = {
     schedule: {
         interval: '1m', // 1 分钟间隔
         type: 'worker', // 指定所有的 worker 都需要执行
-        disable: false
+        disable: app.config.env === "local", // 本地开发环境不执行
     },
     // task 是真正定时任务执行时被运行的函数，第一个参数是一个匿名的 Context 实例
     * task(ctx) {
