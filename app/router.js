@@ -10,7 +10,7 @@ module.exports = app => {
   app.get('/api/cookie', 'api.setCookie');
   app.get('/api/test', 'api.test');
   app.post('/api/messages', 'api.messages');
-
+  app.get('/home/longhubangimage', 'home.longhubangimage');
   app.get('/test/test', 'test.index');
   app.get('/login', 'home.login');
   app.post('/login', 'home.loginDo');

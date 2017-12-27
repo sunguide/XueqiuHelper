@@ -4,6 +4,7 @@ module.exports = app => {
     class indexController extends app.Controller {
         * index() {
             // this.ctx.body = "fuck ";
+            this.ctx.body = yield this.ctx.service.touker.getLoginCookie();return;
             let data = {nickname:this.ctx.session.nickname};
             yield this.ctx.render('home/index.tpl', data);
         }
@@ -75,6 +76,35 @@ module.exports = app => {
           posters = "@" + _.chunk(posters,5)[0].join(", @");
           this.ctx.body = posters;
           // let result = yield this.service.xueqiu.post("请" +posters + " 来点评一下 $同方股份(SH600100)$ ");
+        }
+
+        * longhubangimage(ctx){
+            const moment = require("moment");
+            const fs = require("fs")
+            this.ctx = ctx;
+            this.service = ctx.service;
+            let app = ctx.app;
+            let logger = ctx.logger;
+            this.service = ctx.service;
+            const _ = require('lodash');
+            let lhbs = yield this.service.longhubang.getLhbs(this.ctx.helper.datetime("YYYY-MM-DD"));
+            let identify;
+            let result;
+            if (lhbs) {
+                for (let i = 0; i < lhbs.length; i++) {
+                    identify = this.ctx.helper.md5(lhbs[i].buy_details.toString());
+                    lhbs[i].identify = (lhbs[i].date).replace(new RegExp("-", "gm"), "") + "_" + lhbs[i].stock_code + "_" + identify;
+                    let filepath = './images/' + lhbs[i].identify + ".jpg";
+                    if(!fs.existsSync(filepath)){
+                        let imagePath = yield this.service.longhubang.geneImage(lhbs[i]);
+                        console.log(imagePath);
+                    }else{
+                        console.log("already exits");
+                    }
+                }
+            } else {
+                logger.info("not found 龙虎榜");
+            }
         }
 
         * test2(){
