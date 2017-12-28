@@ -1,7 +1,28 @@
 'use strict';
 
 const kue = require("kue");
+// const request = require("superagent");
+// require("superagent-proxy")(request);
 
+const request = require("./app/libs/request");
+require("superagent-charset")(request);
+
+// let proxy = "http://110.73.10.72:8123";
+let proxy = "http://127.0.0.1:50351"
+// request.get("").proxy(proxy);
+request.enableProxy = true;
+request.proxy = proxy;
+
+for(let i = 0; i < 2; i ++){
+
+    request.get("https://www.baidu.com/")
+        .end((err,res) => {
+            console.log(res.text);
+        });
+
+    console.log(request.proxy);
+}
+return;
 // let queue1 = kue.createQueue({
 //   prefix:"q1",
 //   redis: {

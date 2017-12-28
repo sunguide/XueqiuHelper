@@ -76,5 +76,15 @@ module.exports = helper = {
         }else{
             return false;
         }
+    },
+    JSON:{
+        parse(str){
+            try {
+                str = JSON.parse(str);
+            } catch (e) {
+                return false;
+            }
+            return str;
+        }
     }
 };

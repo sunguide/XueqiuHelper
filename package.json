@@ -28,6 +28,7 @@
     "slimerjs": "^0.10.3",
     "superagent": "^3.6.3",
     "superagent-charset": "^1.2.0",
+    "superagent-proxy": "^1.0.2",
     "winston": "^2.4.0",
     "xmldom": "^0.1.27",
     "xpath": "^0.0.24"

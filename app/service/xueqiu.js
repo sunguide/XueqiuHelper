@@ -1,6 +1,6 @@
 'use strict';
 
-const request = require("superagent");
+const request = require("../libs/request");
 require("superagent-charset")(request);
 
 module.exports = app => {
@@ -56,6 +56,7 @@ module.exports = app => {
 
         * post(message,title,cookie) {
             let urls = this.urls;
+            let ctx = this.ctx;
             let base_headers = this.base_headers;
             if(!cookie){
                 cookie = yield this.getLoginCookie();
@@ -65,6 +66,7 @@ module.exports = app => {
                 "status": message,
                 "session_token": token
             };
+            console.log(form);
             if(title){
                 form = {
                     "status": message,
@@ -83,7 +85,8 @@ module.exports = app => {
                     .type("form")
                     .send(form)
                     .end((err, res) => {
-                        let resData = JSON.parse(res.text);
+                        console.log(res.text);
+                        let resData = ctx.helper.JSON.parse(res.text);
                         if(err){
                             resolve(false);
                         }
@@ -244,6 +247,7 @@ module.exports = app => {
             if(!cookie){
                 cookie = yield this.getLoginCookie();
             }
+            let ctx = this.ctx;
             let base_headers = this.base_headers;
             let urls = this.urls;
             return new Promise(function (resolve, reject) {
@@ -251,7 +255,8 @@ module.exports = app => {
                     .set(base_headers)
                     .set("Cookie", cookie)
                     .end((err, res) => {
-                        let data = JSON.parse(res.text);
+                        let data = ctx.helper.JSON.parse(res.text);
+                        console.log(res.text);
                         if (data && data.token) {
                             resolve(data.token);
                         } else {
@@ -263,12 +268,13 @@ module.exports = app => {
 
         * getTodayStockInfo(stock_code) {
             let cookie = yield this.getLoginCookie();
+            let ctx = this.ctx;
             let quote = yield function () {
                 return new Promise(function (resolve, reject) {
                     request.get("https://xueqiu.com/v4/stock/quote.json?code=" + xueqiu.getFullStockCode(stock_code) + "&_=" + new Date().getTime())
                         .set("Cookie", cookie)
                         .end((err, res) => {
-                            let info = JSON.parse(res.text);
+                            let info = ctx.helper.JSON.parse(res.text);
                             if (err || info.error_code) {
                                 resolve(false);
                             } else {
@@ -468,6 +474,7 @@ module.exports = app => {
                                             cookie = "xq_a_token=" + loginData.access_token;
                                             resolve(cookie);
                                         } else {
+                                            console.log("get token fail");
                                             reject("get token fail");
                                         }
                                     });

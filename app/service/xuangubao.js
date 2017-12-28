@@ -17,6 +17,7 @@ module.exports = app => {
                     username: "sunguide2@wolfunds.com",
                     password: "sunguide1989"
                 });
+                console.log(cookie);
                 for(let i = 0;i< msgs.length;i++){
                     if(msgs[i].Id <= lastId){
                         continue;
@@ -42,6 +43,7 @@ module.exports = app => {
                                     message += " #" + msgs[i].BkjInfoArr[k].Name + "# ";
                                 }
                             }
+                            console.log(message);
                             let posted = yield this.ctx.service.xueqiu.post(message,title,cookie);
                             if(posted){
                                 yield this.ctx.app.redis.set("xuangubao_last_id",msgs[i].Id);
