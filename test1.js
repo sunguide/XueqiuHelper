@@ -13,9 +13,9 @@ let proxy = "http://127.0.0.1:50351"
 request.enableProxy = true;
 request.proxy = proxy;
 
-for(let i = 0; i < 2; i ++){
+for(let i = 0; i < 1; i ++){
 
-    request.get("https://www.baidu.com/")
+    request.get("https://xueqiu.com/statuses/search.json?count=10&comment=0&symbol=600100&hl=0&source=user&sort=time&page=1&")
         .end((err,res) => {
             console.log(res.text);
         });
