@@ -36,13 +36,8 @@ module.exports = app => {
             const _ = require('lodash');
 
             let now = Date.now();
-            let options = {
-              headers: {Cookie:yield this.getLoginCookie()},
-              dataType: 'json'
-            };
             stock_code = xueqiu.getFullStockCode(stock_code);
-            const res = yield this.ctx.curl(`https://xueqiu.com/statuses/search.json?count=10&comment=0&symbol=${stock_code}&hl=0&source=user&sort=time&page=1&_=${now}`,options);
-            let data = res.data;
+            const data = yield this.getRecentPosterApi(`https://xueqiu.com/statuses/search.json?count=10&comment=0&symbol=${stock_code}&hl=0&source=user&sort=time&page=1&_=${now}`);
             let posters = [];
             if(data.list){
                for(let i = 0; i < data.list.length; i++){
@@ -52,6 +47,27 @@ module.exports = app => {
                }
             }
             return _.uniq(posters);
+        }
+
+        * getRecentPosterApi(url){
+            let base_headers = this.base_headers;
+            let cookie = yield this.getLoginCookie();
+
+            let ctx = this.ctx;
+            return new Promise(function (resolve, reject) {
+                request.get(url)
+                    .set(base_headers)
+                    .set("Cookie", cookie)
+                    .end((err, res) => {
+                        if (!err) {
+                            let data = res.text;
+                            data = ctx.helper.JSON.parse(res.text);
+                            resolve(data);
+                        } else {
+                            reject(err);
+                        }
+                    });
+            });
         }
 
         * post(message,title,cookie) {
