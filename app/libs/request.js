@@ -8,7 +8,7 @@ const request = require("superagent");
 // request.proxy = null; //http://localhost:8008
 
 
-request.enableProxy = true;
+request.enableProxy = false;
 request.proxy = "http://127.0.0.1:50351";
 
 request.get = function (url, data, fn){
