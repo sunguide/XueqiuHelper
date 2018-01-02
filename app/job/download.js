@@ -9,7 +9,6 @@ class download extends Subscription {
     };
   }
   async subscribe() {
-      console.log("zhixing");
       this.ctx.app.kue.process('task_download', function(job, done){
         startDownload(job, done);
       });
@@ -21,7 +20,6 @@ class download extends Subscription {
 
         done("done success");
       }
-      console.log("ddd");
   }
   async done(){
 

@@ -15,22 +15,26 @@ module.exports = app => {
 
         * getLhbs(date) {
             let lhbs = [];
+            let save = this.save;
             return new Promise((resolve, reject) => {
-                request.get("http://data.10jqka.com.cn/market/longhu/")
+                //http://data.10jqka.com.cn/ifmarket/lhbggxq/report/2017-12-26/
+
+                let url = "http://data.10jqka.com.cn/ifmarket/lhbggxq/report/"+date;//"http://data.10jqka.com.cn/market/longhu/";
+                request.get(url)
                     .charset("GBK")
                     .end((err,res) => {
                         let $ = cheerio.load(res.text,{decodeEntities: false});
-                        let today = $(".m_text_date.startday").val();
-                        if(today != date){
-                            resolve(false);
-                        }
+                        // let today = $(".m_text_date.startday").val();
+                        // if(today != date){
+                        //     resolve(false);
+                        // }
                         $('.stockcont').each(function (i,item) {
                             item = $(item);
                             let stock_code = item.attr('stockcode');
                             let lhb_title = item.find('p').first().text();
                             let lhb_reason = lhb_title.split("明细：")[1];
                             let stock_name = lhb_title.split("(")[0];
-                            lhb_title = stock_name + "(" + stock_code + ")：" + today + " 龙虎榜数据";
+                            lhb_title = stock_name + "(" + stock_code + ")：" + date + " 龙虎榜数据";
                             let unitNames = item.find('.cell-cont p').first().text().split("元");
                             let buy_amount = item.find('.cell-cont p .c-rise').first().text();
                             if(unitNames[1][unitNames[1].length - 1] === "亿"){
@@ -81,7 +85,7 @@ module.exports = app => {
                             let lhb = {
                                 stock_code:stock_code,
                                 stock_name:stock_name,
-                                date:today,
+                                date:date,
                                 title:lhb_title,
                                 reason:lhb_reason,
                                 buy_amount:buy_amount,
@@ -90,10 +94,62 @@ module.exports = app => {
                                 sell_details:sell_details
                             };
                             lhbs.push(lhb);
+
                         });
                         resolve(lhbs);
 
                     });
+            });
+
+        }
+
+        * save(item){
+
+            let ctx = this.ctx;
+
+            return new Promise((resolve, reject) => {
+
+                let id = ctx.helper.md5(item.date + item.stock_code + item.reason);
+
+                let data = {
+                    id:id,
+                    stock_code:item.stock_code,
+                    stock_name:item.stock_name,
+                    date:item.date,
+                    reason:item.reason,
+                    buy_amount:item.buy_amount,
+                    sell_amount:item.sell_amount,
+                    net_amount:item.buy_amount - item.sell_amount,
+                    buy_details:item.buy_details,
+                    sell_details:item.sell_details
+                };
+                // if(item.buy_details){
+                //     for(let k = 0; k < item.buy_details.length; k++){
+                //         data['buy'+(k+1)] = item.buy_details[k].amount
+                //     }
+                // }
+                ctx.model.Longhubang.find({id: id}, function (err, exist) {
+                    if (exist.length === 0) {
+                        let Cube = new ctx.model.Longhubang(data);
+                        Cube.save(function (err, docs) {
+                            console.log("save success" + docs)
+                            if(err){
+                                resolve(false);
+                            }else{
+                                resolve(true);
+                            }
+                        });
+                    } else {
+                        resolve(false);
+                        // ctx.model.XueqiuCube.update({id: id, date: date}, data, {multi: true}, function (err) {
+                        //     if(err){
+                        //         resolve(false);
+                        //     }else{
+                        //         resolve(true);
+                        //     }
+                        // });
+                    }
+                });
             });
 
         }

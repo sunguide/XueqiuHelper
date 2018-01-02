@@ -49,7 +49,7 @@ module.exports = app => {
                 }else{
                     if(item[0]){
                         yield  ctx.app.redis.set("pankou_id_"+id,true);
-                        let message = "$" + item[0] + "("+ctx.helper.getFullStockCode(Math.floor(item[4]/10)) + ")$  " + getTradeType(item[3]) + " " +item[2];
+                        let message = "$" + item[0] + "("+ctx.helper.getFullStockCode(item[4].substr(0,6)) + ")$  " + getTradeType(item[3]) + " " +item[2];
                         isPosted = yield ctx.service.xueqiu.post(message,'',cookie);
                         if(!isPosted){
                             ctx.logger.info("post fail");

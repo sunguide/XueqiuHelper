@@ -57,8 +57,11 @@ module.exports = helper = {
         return eval("'" + chars.join('') + "'");
 
     },
-    datetime(format){
+    datetime(format, timestamp){
         const moment = require("moment");
+        if(timestamp){
+            return moment(timestamp).format(format);
+        }
         return moment().format(format);
     },
     * sleep(timeout){

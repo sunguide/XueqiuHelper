@@ -24,11 +24,15 @@ module.exports = app => {
   app.get('/test/notifyLHB', 'test.notifyLHB');
   app.get('/test/lhbimage','test.geneLHBImage');
 
+
+  app.get("/longhubang", 'longhubang.getFullLhbs');
   app.get('/v2/api/register','api.user.register');
   app.get('/v2/api/login','api.user.login');
   app.get('/v2/api/app/register','api.app.register');
   app.get('/v2/api/app/update','api.app.update');
+  app.get("*",function(){
 
+  })
 
 
   // app.get('/api/idCard', 'api.idCard');
