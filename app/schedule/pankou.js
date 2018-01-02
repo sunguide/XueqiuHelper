@@ -5,7 +5,7 @@ module.exports = app => {
     return {
         // 通过 schedule 属性来设置定时任务的执行间隔等配置
         schedule: {
-            interval: '5s', // 1 分钟间隔
+            interval: '1m', // 1 分钟间隔
             type: 'worker', // 指定所有的 worker 都需要执行
             disable: true
         },
@@ -26,9 +26,32 @@ module.exports = app => {
             if(results && results.data.length > 0){
                 results = results.data;
                 results = results.reverse();
+                let post_content = "";
                 for(let i = 0;i< results.length;i++){
-                    yield post(results[i], ctx);
+                    let item = results[i];
+                    let date = ctx.helper.datetime("YYYY-MM-DD");
+                    item = item.split(",");
+                    let id = ctx.helper.md5(date + item[0]+item[2]+item[3]+item[4]);
+                    let itemTime = Date.parse(date + " " + item[1]);
+                    //超过60s,就失效
+                    if(itemTime < (Date.now() -60000)){
+                        continue;
+                    }
+                    let isPosted = yield ctx.app.redis.get("pankou_id_"+id);
+
+                    if(!isPosted){
+                        post_content +=  "<br>$" + item[0] + "("+ctx.helper.getFullStockCode(item[4].substr(0,6)) + ")$  " + getTradeType(item[3]) + " " +item[2];
+                    }
                 }
+                if(post_content){
+                    let isPosted = yield ctx.service.xueqiu.post(message,'',cookie);
+                    if(!isPosted){
+                        ctx.logger.info("post fail");
+                    }else{
+                        ctx.logger.info(message + ": 发布成功");
+                    }
+                }
+
             }else{
                 console.log("fetch pankou fail");
                 console.log(results);
