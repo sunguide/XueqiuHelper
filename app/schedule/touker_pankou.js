@@ -1,56 +1,56 @@
 'use strict';
 //
 module.exports = app => {
-//	582908c3-fbec-4e2d-9402-4eb97570709143C272DC	.touker.com	/	2020-12-26T07:19:19.551Z	47	✓
-// _d_	"D9AC10DB5CAFD9C8, "	.touker.com	/	2017-12-27T08:32:26.599Z	26
-// _e_	"{\"id\":\"D9AC10DB5CAFD9C8\",\"_e_\":\"07F2C880E533466C52EB811DD361B140\",\"_sign_\":\"BD276F82\"}"	.touker.com	/	Session	103	✓
-// _s_	"{\"id\":\"D9AC10DB5CAFD9C8\",\"_e_\":\"07F2C880E533466C52EB811DD361B140\",\"_sign_\":\"8E9CA90C\"}"	.touker.com	/	Session	103	✓	✓
-// ssid
+
     return {
         // 通过 schedule 属性来设置定时任务的执行间隔等配置
         schedule: {
-            interval: '1s', // 1 分钟间隔
+            interval: '1m', // 1 分钟间隔
             type: 'worker', // 指定所有的 worker 都需要执行
             disable: true
         },
         // task 是真正定时任务执行时被运行的函数，第一个参数是一个匿名的 Context 实例
         * task(ctx) {
-            let cookie = yield ctx.service.xueqiu.getLoginCookie({
-                username: "18521526526",
-                password: "woshini8"
-            });
 
-            let lastId = yield app.redis.get("xuangubao_last_id");
             let current = Date.now();
-            let date = ctx.helper.datetime("YYYY-MM-DD");
-            let results = yield  ctx.curl(`http://nuyd.eastmoney.com/EM_UBG_PositionChangesInterface/api/js?dtformat=HH:mm:ss&js=[(x)]&rows=10&cb=&page=1&type=8201,8202,8193,4,32,8204,8203,8194,8,16,128&_=${current}`, {dataType: 'json' })
+            if (new Date().getHours() < 9 || new Date().getHours() > 15  || new Date().getDay() === 0 || new Date().getDay() === 6) {
+                logger.info("盘口单日尚未开市或者休市日");
+                return;
+            }
+            let results = yield ctx.curl(`http://nuyd.eastmoney.com/EM_UBG_PositionChangesInterface/api/js?dtformat=HH:mm:ss&js=[(x)]&rows=10&cb=&page=1&type=8201,8193,4,64&_=${current}`, {dataType: 'json' })
+
             if(results && results.data.length > 0){
                 results = results.data;
                 results = results.reverse();
+                let post_content = "";
                 for(let i = 0;i< results.length;i++){
-                    let id = ctx.helper.md5(date + results[i]);
-                    let item = results[i].split(",");
+                    let item = results[i];
+                    let date = ctx.helper.datetime("YYYY-MM-DD");
+                    item = item.split(",");
+                    let id = ctx.helper.md5(date + item[0]+item[2]+item[3]+item[4]);
                     let itemTime = Date.parse(date + " " + item[1]);
-                    //超过120s,就失效
-                    if(itemTime < (Date.now() -120000)){
+                    //超过60s,就失效
+                    if(itemTime < (Date.now() -60000)){
                         continue;
                     }
-                    let isPosted = yield ctx.app.redis.get("pankou_id_"+id);
+                    let isPosted = yield ctx.app.redis.get("touker_pankou_id_"+id);
 
-                    if(isPosted){
-                        continue;
-                    }else{
-                        if(item[0]){
-                            let message = "$" + item[0] + "("+ctx.helper.getFullStockCode(Math.floor(item[4]/10)) + ")$  " + getTradeType(item[3]) + " " +item[2];
-                            isPosted = yield ctx.service.xueqiu.post(message,'',cookie);
-                            if(isPosted){
-                                yield  ctx.app.redis.set("pankou_id_"+id,true);
-                            }else{
+                    if(!isPosted){
+                        yield  ctx.app.redis.set("touker_pankou_id_"+id,true);
+
+                        post_content =  "$" + item[0] + "("+ctx.helper.getToukerFullStockCode(item[4].substr(0,6)) + ")$  " + getTradeType(item[3]) + " " +item[2];
+                        if(post_content){
+                            console.log(post_content);
+                            let isPosted = yield ctx.service.touker.postComment(item[4].substr(0,6),post_content);
+                            if(!isPosted){
                                 ctx.logger.info("post fail");
+                            }else{
+                                ctx.logger.info(post_content + ": 发布成功");
                             }
                         }
                     }
                 }
+
             }else{
                 console.log("fetch pankou fail");
                 console.log(results);

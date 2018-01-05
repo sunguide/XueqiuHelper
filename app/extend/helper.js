@@ -6,6 +6,13 @@ module.exports = helper = {
             return "SH" + stock_code;
         }
     },
+    getToukerFullStockCode(stock_code) {
+        if (stock_code < "600000") {
+            return stock_code + ".SZ";
+        } else {
+            return stock_code + ".SH";
+        }
+    },
     getStockAnchor(stock_code, stock_name){
         return "$" + stock_name + "(" + helper.getFullStockCode(stock_code) + ")$";
     },

@@ -4,12 +4,25 @@ module.exports = app => {
     class touker extends app.Service {
         constructor(ctx) {
             super(ctx);
+            this.base_headers = {
+                Accept: "*/*",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Accept-Language": "zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4,ja;q=0.2",
+                "Cache-Control": "no-cache",
+                Connection: "keep-alive",
+                Host: "touker.com",
+                Origin: "https://touker.com",
+                Pragma: "no-cache",
+                Referer: "https://touker.com/",
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36",
+                "X-Requested-With": "XMLHttpRequest"
+            };
         }
         * getLoginCookie(options) {
             let urls = this.urls;
             let loginPass = {
-                loginId: "13800000330",
-                password: "22D05E795A4D63232E8C8DA2CCC325A4",
+                loginId: "18521527527",
+                password: "3D0B0B468EED5CF7C71A8A2F6D1C3387",
                 appId: "",
                 deviceUUID:""
             };
@@ -88,19 +101,47 @@ module.exports = app => {
             })
         }
 
-        * postComment(code, message){
-            message = "$文峰股份(601010.SH)$的的是否多少多少速度 ";
-            let cookies = yield this.getLoginCookie();
+        * uploadImage(filePath){
+            let cookie = yield this.getLoginCookie();
+            let urls = this.urls;
+            let base_headers = this.base_headers;
+            return new Promise((resolve, reject) => {
+                request.post("https://bbs.touker.com/misc.php?mod=swfupload&action=swfupload&operation=upload&fid=22")
+                    // .set(base_headers)
+                    .set("Cookie", cookie)
+                    .attach('file', filePath)
+                    .field('Filename', filePath)
+                    .field('uid', 2242360)
+                    .redirects(0)
+                    .end((err,res) => {
+                        console.log("text:dddd")
+                        console.log(res.text);
+                        return;
+                        if(err) reject(err);
+                        let resData = JSON.parse(res.text);
+                        if(resData.url){
+                            resolve(resData.url + '/' + resData.filename);
+                        }else{
+                            resolve(false);
+                        }
+                    });
+            });
+        }
+
+        * postComment(code, message, cookies){
+            if(!cookies){
+                cookies = yield this.getLoginCookie();
+            }
             let url = yield this.getCommentPageUrl(code);
-            let token = yield this.getCommentToken(url);
+            // let token = yield this.getCommentToken(url);
             let cookie = "";
             if(cookies && cookies.length > 0){
                 for(let i = 0; i< cookies.length; i++){
                     cookie += cookies[i].split(";")[0]+";"
                 }
             }
-            console.log(cookies);
-            console.log(cookie);
+            // console.log(cookies);
+            // console.log(cookie);
             let params = {
                 type:1,
                 commentContent:message,
@@ -109,11 +150,9 @@ module.exports = app => {
                 rootId:0,
                 code:code,
                 topicType:2,
-                _hbtoken_:token
             }
-            console.log(params);
             return new Promise((resolve, reject) => {
-                request.post("https://m.touker.com/sns/comment/addPublish.do")
+                request.post("https://m.touker.com/sns/comment/addCommunity.do")
                     .set("cookie", cookie)
                     .set("referer", url)
                     .type("form")
