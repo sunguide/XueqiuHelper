@@ -86,7 +86,7 @@ module.exports = app => {
             if(title){
                 form = {
                     "status": message,
-                    "title": title,
+                    "title": title.slice(0,28),
                     "original":0,
                     "right":true,
                     "session_token": token
@@ -111,7 +111,8 @@ module.exports = app => {
                             console.log("请重发");
                             resolve(-1)
                         } else if (resData && resData.error_code) {
-                            resolve(false);
+							console.log(resData);
+							resolve(false);
                         } else {
                             console.log("发布成功");
                             resolve(resData);
@@ -271,12 +272,13 @@ module.exports = app => {
                     .set(base_headers)
                     .set("Cookie", cookie)
                     .end((err, res) => {
-                        let data = ctx.helper.JSON.parse(res.text);
                         console.log(res.text);
+						let data = ctx.helper.JSON.parse(res.text);
                         if (data && data.token) {
                             resolve(data.token);
                         } else {
-                            reject(err);
+                            console.log(err);
+							reject(err);
                         }
                     });
             });

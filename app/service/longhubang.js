@@ -264,7 +264,7 @@ module.exports = app => {
                         console.log('gene image');
                         gm("./data/images/top.jpg")
                             .append(filepath)
-                            .append("./data/images/ad.jpg")
+                            //.append("./data/images/ad.jpg")
                             .write(filepath,function (err) {
                                 if(err){
                                     reject(err);

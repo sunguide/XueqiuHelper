@@ -7,11 +7,12 @@ module.exports = app => {
         schedule: {
             interval: '1m', // 1 分钟间隔
             type: 'worker', // 指定所有的 worker 都需要执行
-            disable: true
+            disable: app.config.env === "local"
         },
         // task 是真正定时任务执行时被运行的函数，第一个参数是一个匿名的 Context 实例
         * task(ctx) {
-            let cookie = yield ctx.service.xueqiu.getLoginCookie({
+            console.log("pankou start");
+			let cookie = yield ctx.service.xueqiu.getLoginCookie({
                 username: "18521526526",
                 password: "woshini8"
             });
@@ -22,7 +23,7 @@ module.exports = app => {
                 return;
             }
             let results = yield ctx.curl(`http://nuyd.eastmoney.com/EM_UBG_PositionChangesInterface/api/js?dtformat=HH:mm:ss&js=[(x)]&rows=10&cb=&page=1&type=8201,8193,4,64&_=${current}`, {dataType: 'json' })
-
+			console.log(results);
             if(results && results.data.length > 0){
                 results = results.data;
                 results = results.reverse();
@@ -35,17 +36,26 @@ module.exports = app => {
                     let itemTime = Date.parse(date + " " + item[1]);
                     //超过60s,就失效
                     if(itemTime < (Date.now() -60000)){
-                        continue;
+						continue;
                     }
                     let isPosted = yield ctx.app.redis.get("pankou_id_"+id);
 
                     if(!isPosted){
                         post_content +=  "<br>$" + item[0] + "("+ctx.helper.getFullStockCode(item[4].substr(0,6)) + ")$  " + getTradeType(item[3]) + " " +item[2];
                     }
+					if(i > 1){
+						break;
+					}
                 }
+				console.log("content:");
+				console.log(post_content);
+				console.log(cookie);
                 if(post_content){
-                    let isPosted = yield ctx.service.xueqiu.post(message,'',cookie);
+					console.log("start post");
+                    let isPosted = yield ctx.service.xueqiu.post(post_content,'',cookie);
                     if(!isPosted){
+						console.log("pankou post fail");
+                        console.log(res.text);
                         ctx.logger.info("post fail");
                     }else{
                         ctx.logger.info(message + ": 发布成功");
